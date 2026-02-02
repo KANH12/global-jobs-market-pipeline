@@ -1,0 +1,4 @@
+endpoint: http://minio:9000
+access_key: minioadmin
+secret_key: minioadmin
+bucket: data-lake

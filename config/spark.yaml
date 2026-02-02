@@ -1,0 +1,20 @@
+app:
+  name: adzuna-bronze-reader
+
+resources:
+  executor:
+    memory: 2g
+    cores: 2
+  driver:
+    memory: 1g
+
+tuning:
+  shuffle_partitions: 200
+  parallelism: 200
+
+s3a:
+  endpoint: http://minio:9000
+  access_key: minioadmin
+  secret_key: minioadmin
+  path_style_access: true
+  impl: org.apache.hadoop.fs.s3a.S3AFileSystem

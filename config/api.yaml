@@ -1,0 +1,6 @@
+base_url: https://api.adzuna.com/v1/api
+country: gb
+
+results_per_page: 50
+max_pages: 5
+timeout: 30
