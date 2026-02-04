@@ -2,15 +2,22 @@ from pyspark.sql import functions as F
 from core.spark_session import create_spark_session
 from core.logger import get_job_logger
 
-
 logger = get_job_logger(
     job_name="adzuna_jobs_silver_writer",
     component="silver"
 )
 
-
 def write_jobs_silver(df, date_path: str):
     logger.info("🚀 START Silver jobs transform")
+
+    # =========================
+    # 0. Explode bronze records → job-level
+    # =========================
+    df = (
+        df
+        .filter(F.col("records").isNotNull())
+        .select(F.explode("records").alias("job"))
+    )
 
     # =========================
     # 1. Filter invalid jobs
@@ -29,15 +36,12 @@ def write_jobs_silver(df, date_path: str):
         F.col("job.id").alias("job_id"),
         F.col("job.title"),
         F.upper(F.trim(F.col("job.contract_time"))).alias("contract_time"),
-
         F.upper(F.trim(F.col("job.contract_type"))).alias("contract_type"),
-
         F.col("job.created").cast("timestamp"),
 
         F.col("job.salary_min"),
         F.col("job.salary_max"),
         (F.col("job.salary_is_predicted") == "1").alias("salary_is_predicted"),
-
 
         F.col("job.latitude"),
         F.col("job.longitude"),
@@ -97,11 +101,13 @@ if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/01/22"
+    date_path = "2026/02/04"
 
     try:
-        df = spark.read.parquet(
-            f"s3a://data-lake/bronze/adzuna/{date_path}"
+        df = (
+            spark.read
+            .option("multiLine", True)
+            .json(f"s3a://data-lake/bronze/adzuna/{date_path}/*.json")
         )
 
         write_jobs_silver(df, date_path)
