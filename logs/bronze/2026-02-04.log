@@ -1,0 +1,8 @@
+2026-02-04 07:43:01,242 | INFO | bronze.adzuna_bronze_reader | 🚀 START adzuna bronze reader
+2026-02-04 07:43:04,728 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-02-04 07:43:04,729 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/02/04
+2026-02-04 07:43:04,732 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/02/04/*.json
+2026-02-04 07:43:16,718 | INFO | bronze.adzuna_bronze_reader | 📊 Record count=3
+2026-02-04 07:43:16,721 | INFO | bronze.adzuna_bronze_reader | 📐 Schema:
+2026-02-04 07:43:16,741 | INFO | bronze.adzuna_bronze_reader | ✅ Bronze read completed successfully
+2026-02-04 07:43:17,428 | INFO | bronze.adzuna_bronze_reader | 🛑 Spark session stopped
