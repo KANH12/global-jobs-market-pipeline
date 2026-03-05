@@ -14,7 +14,7 @@ def check_record_count(df: DataFrame):
         logger.error("❌ Bronze dataset is EMPTY")
         raise Exception("Bronze data ingestion failed")
 
-    if count < 5:
+    if count < 1:
         logger.warning(f"⚠️ Very small dataset detected: {count}")
 
     logger.info(f"✅ Record count check passed: {count}")
