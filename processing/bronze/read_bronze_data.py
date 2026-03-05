@@ -1,6 +1,7 @@
 import logging
 from core.spark_session import create_spark_session
 from core.logger import get_job_logger
+from quality_process.bronze_quality import run_bronze_quality_checks
 # =========================
 # Logger setup
 # =========================
@@ -46,7 +47,9 @@ if __name__ == "__main__":
         logger.info(f"📊 Record count={record_count}")
 
         logger.info("📐 Schema:")
-        df.printSchema()
+        logger.info(df.printSchema())
+
+        run_bronze_quality_checks(df)
 
         logger.info("✅ Bronze read completed successfully")
 
