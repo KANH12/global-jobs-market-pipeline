@@ -24,6 +24,7 @@ services:
       - ./config:/home/jovyan/config
       - ./core:/home/jovyan/core
       - ./logs:/home/jovyan/logs
+      - ./quality:/home/jovyan/quality
     working_dir: /home/jovyan
     environment:
       - PYTHONPATH=/home/jovyan

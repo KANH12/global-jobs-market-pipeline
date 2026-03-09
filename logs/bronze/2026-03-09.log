@@ -1,0 +1,15 @@
+2026-03-09 04:01:25,366 | INFO | bronze.adzuna_bronze_reader | ============================================================
+2026-03-09 04:01:25,366 | INFO | bronze.adzuna_bronze_reader | 🚀 START adzuna bronze reader
+2026-03-09 04:01:27,557 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-03-09 04:01:27,561 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/03/08
+2026-03-09 04:01:27,562 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/03/08/*.json
+2026-03-09 04:01:34,670 | INFO | bronze.adzuna_bronze_reader | 📊 Record count=3
+2026-03-09 04:01:34,672 | INFO | bronze.adzuna_bronze_reader | 📐 Schema:
+2026-03-09 04:01:34,685 | INFO | bronze.adzuna_bronze_reader | 🔍 START Bronze quality checks
+2026-03-09 04:01:36,319 | INFO | bronze.adzuna_bronze_reader | ✅ Record count check passed: 3
+2026-03-09 04:01:36,417 | INFO | bronze.adzuna_bronze_reader | ✅ Required columns check passed
+2026-03-09 04:01:37,402 | INFO | bronze.adzuna_bronze_reader | ✅ Records structure check passed
+2026-03-09 04:01:37,654 | INFO | bronze.adzuna_bronze_reader | 🎉 Bronze quality checks passed | rows=3 | columns=5
+2026-03-09 04:01:37,655 | INFO | bronze.adzuna_bronze_reader | ✅ Bronze read completed successfully
+2026-03-09 04:01:37,859 | INFO | bronze.adzuna_bronze_reader | 🛑 Spark session stopped
+2026-03-09 04:01:37,859 | INFO | bronze.adzuna_bronze_reader | ============================================================

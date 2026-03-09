@@ -1,0 +1,12 @@
+2026-03-08 22:35:48,392 | INFO | api.adzuna_fetch | API_JOB_START | source=adzuna
+2026-03-08 22:35:48,393 | INFO | api.adzuna_fetch | START_FETCH | source=adzuna | page=1 | params=None
+2026-03-08 22:35:50,184 | INFO | api.adzuna_fetch | FETCH_SUCCESS | source=adzuna | page=1 | records=50
+2026-03-08 22:35:50,186 | INFO | api.adzuna_fetch | START_FETCH | source=adzuna | page=2 | params=None
+2026-03-08 22:35:52,277 | INFO | api.adzuna_fetch | FETCH_SUCCESS | source=adzuna | page=2 | records=50
+2026-03-08 22:35:52,279 | INFO | api.adzuna_fetch | START_FETCH | source=adzuna | page=3 | params=None
+2026-03-08 22:35:54,196 | INFO | api.adzuna_fetch | FETCH_SUCCESS | source=adzuna | page=3 | records=50
+2026-03-08 22:35:54,199 | INFO | api.adzuna_fetch | START_FETCH | source=adzuna | page=4 | params=None
+2026-03-08 22:35:56,207 | INFO | api.adzuna_fetch | FETCH_SUCCESS | source=adzuna | page=4 | records=50
+2026-03-08 22:35:56,210 | INFO | api.adzuna_fetch | START_FETCH | source=adzuna | page=5 | params=None
+2026-03-08 22:35:58,259 | INFO | api.adzuna_fetch | FETCH_SUCCESS | source=adzuna | page=5 | records=50
+2026-03-08 22:35:58,261 | INFO | api.adzuna_fetch | API_JOB_FINISH | source=adzuna | total_record=250

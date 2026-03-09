@@ -1,7 +1,7 @@
 import logging
 from core.spark_session import create_spark_session
 from core.logger import get_job_logger
-from quality_process.bronze_quality import run_bronze_quality_checks
+from quality.bronze_quality import run_bronze_quality_checks
 # =========================
 # Logger setup
 # =========================
@@ -33,12 +33,13 @@ def read_adzuna_bronze(spark, date_path: str):
 
 
 if __name__ == "__main__":
+    logger.info("="*60)
     logger.info("🚀 START adzuna bronze reader")
 
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/02/04"
+    date_path = "2026/03/08"
 
     try:
         df = read_adzuna_bronze(spark, date_path)
@@ -47,9 +48,9 @@ if __name__ == "__main__":
         logger.info(f"📊 Record count={record_count}")
 
         logger.info("📐 Schema:")
-        logger.info(df.printSchema())
+        df.printSchema()
 
-        run_bronze_quality_checks(df)
+        run_bronze_quality_checks(df, logger)
 
         logger.info("✅ Bronze read completed successfully")
 
@@ -60,3 +61,4 @@ if __name__ == "__main__":
     finally:
         spark.stop()
         logger.info("🛑 Spark session stopped")
+        logger.info("="*60)

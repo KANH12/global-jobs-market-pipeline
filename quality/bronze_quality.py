@@ -3,10 +3,10 @@ from core.logger import get_job_logger
 
 logger = get_job_logger(
     job_name="adzuna_bronze_quality",
-    component="quality"
+    component="bronze"
 )
 
-def check_record_count(df: DataFrame):
+def check_record_count(df: DataFrame, logger):
 
     count = df.count()
 
@@ -14,13 +14,10 @@ def check_record_count(df: DataFrame):
         logger.error("❌ Bronze dataset is EMPTY")
         raise Exception("Bronze data ingestion failed")
 
-    if count < 1:
-        logger.warning(f"⚠️ Very small dataset detected: {count}")
-
     logger.info(f"✅ Record count check passed: {count}")
 
 
-def check_required_columns(df: DataFrame):
+def check_required_columns(df: DataFrame, logger):
 
     required_columns = [
         "records",
@@ -40,7 +37,7 @@ def check_required_columns(df: DataFrame):
     logger.info("✅ Required columns check passed")
 
 
-def check_records_structure(df: DataFrame):
+def check_records_structure(df: DataFrame, logger):
 
     null_records = df.filter("records IS NULL").count()
 
@@ -51,15 +48,15 @@ def check_records_structure(df: DataFrame):
     logger.info("✅ Records structure check passed")
 
 
-def run_bronze_quality_checks(df: DataFrame):
+def run_bronze_quality_checks(df: DataFrame, logger):
 
     logger.info("🔍 START Bronze quality checks")
 
     df.cache()
 
-    check_record_count(df)
-    check_required_columns(df)
-    check_records_structure(df)
+    check_record_count(df, logger)
+    check_required_columns(df, logger)
+    check_records_structure(df, logger)
 
     logger.info(
         f"🎉 Bronze quality checks passed | rows={df.count()} | columns={len(df.columns)}"
