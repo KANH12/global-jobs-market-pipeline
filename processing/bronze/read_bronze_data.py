@@ -23,13 +23,13 @@ def read_adzuna_bronze(spark, date_path: str):
     logger.info(f"📅 date_path={date_path}")
     logger.info(f"📁 source_path={path}")
 
-    df = (
+    df_bronze = (
         spark.read
         .option("multiLine", True)
         .json(path)
     )
 
-    return df
+    return df_bronze
 
 
 if __name__ == "__main__":
@@ -42,15 +42,15 @@ if __name__ == "__main__":
     date_path = "2026/03/08"
 
     try:
-        df = read_adzuna_bronze(spark, date_path)
+        df_bronze = read_adzuna_bronze(spark, date_path)
 
-        record_count = df.count()
+        record_count = df_bronze.count()
         logger.info(f"📊 Record count={record_count}")
 
         logger.info("📐 Schema:")
-        df.printSchema()
+        df_bronze.printSchema()
 
-        run_bronze_quality_checks(df, logger)
+        run_bronze_quality_checks(df_bronze, logger)
 
         logger.info("✅ Bronze read completed successfully")
 
