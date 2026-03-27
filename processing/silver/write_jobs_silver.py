@@ -50,12 +50,15 @@ def standardize_contract_type(df):
     valid_types = ["FULL_TIME", "PART_TIME", "CONTRACT"]
 
     df = df.withColumn(
-        "contract_type",
-        F.when(
-            ~F.col("contract_type").isin(valid_types),
-            "UNKNOWN"
-        ).otherwise(F.col("contract_type"))
-    )
+    "contract_type",
+    F.when(
+        F.col("contract_type").isNull(),
+        "UNKNOWN"
+    ).when(
+        ~F.col("contract_type").isin(valid_types),
+        "UNKNOWN"
+    ).otherwise(F.col("contract_type"))
+)
 
     logger.info("🧽 Standardized contract_type")
     return df
