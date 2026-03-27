@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
+from pyspark.sql import function as F
 from core.logger import get_job_logger
 
 logger = get_job_logger(
@@ -35,26 +35,12 @@ def check_salary(df: DataFrame):
 
 #check contract_type
 def check_contract_type(df: DataFrame):
-    valid_values = ["FULL_TIME", "PART_TIME", "CONTRACT", "UNKNOWN"]
+    valid = ["FULL_NAME", "PART_TIME", "CONTRACT", "UNKNOWN"]
 
-    invalid_df = df.filter(~F.col("contract_type").isin(valid_values))
+    invalid = df.filter(~F.col("contract_type").isin(valid)).count()
 
-    invalid_count = invalid_df.count()
-
-    if invalid_count == 0:
-        logger.info("✅ No invalid contract_type found")
-        return
-
-    logger.warning(f"⚠️ Found {invalid_count} invalid contract_type rows")
-
-    invalid_summary = (
-        invalid_df
-        .groupBy("contract_type")
-        .count()
-        .orderBy(F.desc("count"))
-    )
-
-    invalid_summary.show(truncate=False)
+    if invalid > 0:
+        logger.warning(f"⚠️ Invalid contract_type rows: {invalid}")
 
 def run_silver_quality_checks(df: DataFrame):
     logger.info("🔍 START Silver quality checks")

@@ -1,7 +1,0 @@
-2026-02-04 08:58:59,840 | INFO | silver.adzuna_jobs_silver_writer | 🚀 START Silver jobs transform
-2026-02-04 08:59:04,167 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed jobs with NULL id: 0
-2026-02-04 08:59:04,492 | INFO | silver.adzuna_jobs_silver_writer | ✅ Selected & transformed columns
-2026-02-04 08:59:04,493 | INFO | silver.adzuna_jobs_silver_writer | 📂 Writing jobs parquet to s3a://data-lake/silver/adzuna/jobs/dt=2026/02/04
-2026-02-04 08:59:09,580 | INFO | silver.adzuna_jobs_silver_writer | 📊 Output records: 250
-2026-02-04 08:59:09,581 | INFO | silver.adzuna_jobs_silver_writer | 🎉 Silver jobs parquet written successfully
-2026-02-04 08:59:09,837 | INFO | silver.adzuna_jobs_silver_writer | 🛑 Spark stopped

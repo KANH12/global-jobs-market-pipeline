@@ -1,0 +1,9 @@
+2026-03-27 01:46:50,698 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-03-27 01:46:50,699 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/03/26
+2026-03-27 01:46:50,700 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/03/26/*.json
+2026-03-27 01:48:10,637 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-03-27 01:48:10,638 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/03/26
+2026-03-27 01:48:10,639 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/03/26/*.json
+2026-03-27 14:42:35,130 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-03-27 14:42:35,131 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/03/26
+2026-03-27 14:42:35,131 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/03/26/*.json

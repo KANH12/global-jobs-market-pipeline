@@ -1,0 +1,22 @@
+2026-03-26 18:41:31,626 | INFO | silver.adzuna_jobs_silver_writer | 🚀 START Silver pipeline | date=2026/02/04
+2026-03-26 18:41:35,025 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed jobs with NULL id: 0
+2026-03-26 18:41:35,292 | INFO | silver.adzuna_jobs_silver_writer | ✅ Selected & transformed columns
+2026-03-26 18:41:35,293 | INFO | silver.adzuna_silver_quality | 🔍 START Silver quality checks
+2026-03-26 18:41:37,719 | WARNING | silver.adzuna_silver_quality | ⚠️ Found 5 duplicate job_ids
+2026-03-26 18:41:38,380 | WARNING | silver.adzuna_silver_quality | ⚠️ Invalid contract_type rows: 39
+2026-03-26 18:41:38,636 | INFO | silver.adzuna_silver_quality | 🎉 Silver quality checks done | rows=250 | cols=18
+2026-03-26 18:41:38,646 | INFO | silver.adzuna_jobs_silver_writer | 📂 Writing jobs parquet to s3a://data-lake/silver/adzuna/jobs/dt=2026/02/04
+2026-03-26 18:41:42,484 | INFO | silver.adzuna_jobs_silver_writer | 📊 Output records: 250
+2026-03-26 18:41:42,485 | INFO | silver.adzuna_jobs_silver_writer | 🎉 Silver jobs parquet written successfully
+2026-03-26 18:41:42,907 | INFO | silver.adzuna_jobs_silver_writer | 🛑 Spark stopped
+2026-03-26 18:53:33,757 | INFO | silver.adzuna_jobs_silver_writer | 🚀 START Silver pipeline | date=2026/03/26
+2026-03-26 18:53:37,805 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed jobs with NULL id: 0
+2026-03-26 18:53:38,170 | INFO | silver.adzuna_jobs_silver_writer | ✅ Selected & transformed columns
+2026-03-26 18:53:38,171 | INFO | silver.adzuna_silver_quality | 🔍 START Silver quality checks
+2026-03-26 18:53:41,116 | WARNING | silver.adzuna_silver_quality | ⚠️ Found 5 duplicate job_ids
+2026-03-26 18:53:41,795 | WARNING | silver.adzuna_silver_quality | ⚠️ Invalid contract_type rows: 22
+2026-03-26 18:53:41,981 | INFO | silver.adzuna_silver_quality | 🎉 Silver quality checks done | rows=250 | cols=18
+2026-03-26 18:53:41,990 | INFO | silver.adzuna_jobs_silver_writer | 📂 Writing jobs parquet to s3a://data-lake/silver/adzuna/jobs/dt=2026/03/26
+2026-03-26 18:53:44,941 | INFO | silver.adzuna_jobs_silver_writer | 📊 Output records: 250
+2026-03-26 18:53:44,945 | INFO | silver.adzuna_jobs_silver_writer | 🎉 Silver jobs parquet written successfully
+2026-03-26 18:53:45,205 | INFO | silver.adzuna_jobs_silver_writer | 🛑 Spark stopped
