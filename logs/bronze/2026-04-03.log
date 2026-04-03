@@ -1,0 +1,21 @@
+2026-04-03 02:04:47,921 | INFO | bronze.adzuna_bronze_reader | ============================================================
+2026-04-03 02:04:47,922 | INFO | bronze.adzuna_bronze_reader | 🚀 START adzuna bronze reader
+2026-04-03 02:04:50,157 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-04-03 02:04:50,158 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/04/03
+2026-04-03 02:04:50,158 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/04/03/*.json
+2026-04-03 02:04:56,668 | INFO | bronze.adzuna_bronze_reader | 📊 Record count=3
+2026-04-03 02:04:56,669 | INFO | bronze.adzuna_bronze_reader | 📐 Schema:
+2026-04-03 02:04:56,673 | INFO | bronze.adzuna_bronze_reader | 🔍 START Bronze quality checks
+2026-04-03 02:04:57,421 | INFO | bronze.adzuna_bronze_reader | ✅ Record count check passed: 3
+2026-04-03 02:04:57,466 | INFO | bronze.adzuna_bronze_reader | ✅ Required columns check passed
+2026-04-03 02:04:58,254 | INFO | bronze.adzuna_bronze_reader | ✅ Records structure check passed
+2026-04-03 02:04:58,501 | INFO | bronze.adzuna_bronze_reader | 🎉 Bronze quality checks passed | rows=3 | columns=5
+2026-04-03 02:04:58,502 | INFO | bronze.adzuna_bronze_reader | ✅ Bronze read completed successfully
+2026-04-03 02:04:58,967 | INFO | bronze.adzuna_bronze_reader | 🛑 Spark session stopped
+2026-04-03 02:04:58,968 | INFO | bronze.adzuna_bronze_reader | ============================================================
+2026-04-03 02:11:36,812 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-04-03 02:11:36,813 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/04/03
+2026-04-03 02:11:36,813 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/04/03/*.json
+2026-04-03 03:21:48,511 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-04-03 03:21:48,514 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/04/03
+2026-04-03 03:21:48,516 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/04/03/*.json

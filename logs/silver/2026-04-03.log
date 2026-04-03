@@ -1,0 +1,28 @@
+2026-04-03 02:11:41,336 | INFO | silver.adzuna_jobs_silver_writer | 🚀 START Silver pipeline | date=2026/04/03
+2026-04-03 02:11:43,615 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed NULL id: 0
+2026-04-03 02:11:46,348 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed duplicate id: 5
+2026-04-03 02:11:46,564 | INFO | silver.adzuna_jobs_silver_writer | 🧽 Standardized contract_type
+2026-04-03 02:11:46,829 | INFO | silver.adzuna_jobs_silver_writer | ✅ Selected & transformed columns
+2026-04-03 02:11:46,830 | INFO | silver.adzuna_silver_quality | 🔍 START Silver quality checks
+2026-04-03 02:11:49,947 | INFO | silver.adzuna_silver_quality | ✅ No duplicates found
+2026-04-03 02:11:50,533 | INFO | silver.adzuna_silver_quality | ✅ No invalid contract_type found
+2026-04-03 02:11:50,793 | INFO | silver.adzuna_silver_quality | 🎉 Silver quality checks done | rows=245 | cols=18
+2026-04-03 02:11:50,802 | INFO | silver.adzuna_jobs_silver_writer | 📂 Writing jobs parquet to s3a://data-lake/silver/adzuna/jobs/dt=2026/04/03
+2026-04-03 02:11:54,319 | INFO | silver.adzuna_jobs_silver_writer | 📊 Output records: 245
+2026-04-03 02:11:54,320 | INFO | silver.adzuna_jobs_silver_writer | 🎉 Silver jobs parquet written successfully
+2026-04-03 02:11:54,643 | INFO | silver.adzuna_jobs_silver_writer | 🛑 Spark stopped
+2026-04-03 02:13:12,079 | INFO | silver.read_adzuna_silver | 📥 Reading silver data from s3a://data-lake/silver/adzuna/jobs/dt=2026/04/03
+2026-04-03 02:13:17,306 | INFO | silver.read_adzuna_silver | 📊 Rows read: 245
+2026-04-03 03:21:52,784 | INFO | silver.adzuna_jobs_silver_writer | 🚀 START Silver pipeline | date=2026/04/03
+2026-04-03 03:21:55,428 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed NULL id: 0
+2026-04-03 03:21:57,463 | INFO | silver.adzuna_jobs_silver_writer | 🧹 Removed duplicate id: 5
+2026-04-03 03:21:57,647 | INFO | silver.adzuna_jobs_silver_writer | 🧽 Standardized contract fields
+2026-04-03 03:21:57,856 | INFO | silver.adzuna_jobs_silver_writer | ✅ Selected & transformed columns
+2026-04-03 03:21:57,857 | INFO | silver.adzuna_silver_quality | 🔍 START Silver quality checks
+2026-04-03 03:22:00,778 | INFO | silver.adzuna_silver_quality | ✅ No duplicates found
+2026-04-03 03:22:01,384 | WARNING | silver.adzuna_silver_quality | ⚠️ Found 20 invalid contract_type rows
+2026-04-03 03:22:03,279 | INFO | silver.adzuna_silver_quality | 🎉 Silver quality checks done | rows=245 | cols=18
+2026-04-03 03:22:03,286 | INFO | silver.adzuna_jobs_silver_writer | 📂 Writing jobs parquet to s3a://data-lake/silver/adzuna/jobs/dt=2026/04/03
+2026-04-03 03:22:06,314 | INFO | silver.adzuna_jobs_silver_writer | 📊 Output records: 245
+2026-04-03 03:22:06,315 | INFO | silver.adzuna_jobs_silver_writer | 🎉 Silver jobs parquet written successfully
+2026-04-03 03:22:06,872 | INFO | silver.adzuna_jobs_silver_writer | 🛑 Spark stopped

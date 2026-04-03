@@ -16,7 +16,7 @@ def build_salary_analysis(df_silver: DataFrame) -> DataFrame:
 
     salary_df = (
         df_silver
-        .groupBy("contract_type")
+        .groupBy("contract_time")
         .agg(
             F.count("*").alias("job_count"),
             F.avg("salary_min").alias("avg_salary_min"),

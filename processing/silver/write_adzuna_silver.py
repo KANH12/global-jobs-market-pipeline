@@ -46,24 +46,30 @@ def deduplicate_jobs(df):
 # =========================
 # 3. Normalize column
 # =========================
-def standardize_contract_type(df):
+def standardize_contract_fields(df):
+
     df = df.withColumn(
-        "contract_type",
-        F.upper(F.trim(F.col("contract_type")))
+        "contract_time",
+        F.when(
+            F.col("contract_time").isNull(),
+            "UNKNOWN"
+        ).otherwise(
+            F.upper(F.trim(F.col("contract_time")))
+        )
     )
 
     df = df.withColumn(
         "contract_type",
-        F.when(F.col("contract_type").isin("FULL_TIME", "FULL-TIME", "PERMANENT"), "FULL_TIME")
-         .when(F.col("contract_type").isin("PART_TIME", "PART-TIME"), "PART_TIME")
-         .when(F.col("contract_type").isin("CONTRACT"), "CONTRACT")
-         .otherwise("UNKNOWN")
+        F.when(
+            F.col("contract_type").isNull(),
+            "UNKNOWN"
+        ).otherwise(
+            F.upper(F.trim(F.col("contract_type")))
+        )
     )
-
-    logger.info("🧽 Standardized contract_type")
+    logger.info("🧽 Standardized contract fields")
     return df
-
-
+    
 def process_silver(df, date_path):
 
     logger.info(f"🚀 START Silver pipeline | date={date_path}")
@@ -73,7 +79,7 @@ def process_silver(df, date_path):
     df = deduplicate_jobs(df)
 
     # 2. Standardization
-    df = standardize_contract_type(df)
+    df = standardize_contract_fields(df)
     
     # =========================
     # 3. Select & transform columns
@@ -81,14 +87,7 @@ def process_silver(df, date_path):
     jobs_df = df.select(
         F.col("id").alias("job_id"),
         F.col("title"),
-        
-        F.when(
-            F.col("contract_time").isNull(),
-            F.lit("UNKNOWN")
-        ).otherwise(
-            F.upper(F.trim(F.col("contract_time")))
-        ).alias("contract_time"),
-        
+        F.col("contract_time"),
         F.col("contract_type"),
         F.col("created").cast("timestamp"),
         F.col("salary_min"),
@@ -160,7 +159,7 @@ if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/03/26"
+    date_path = "2026/04/03"
     
     try:
         #1. read bronze layer

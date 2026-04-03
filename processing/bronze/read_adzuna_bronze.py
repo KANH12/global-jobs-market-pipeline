@@ -39,7 +39,7 @@ if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/03/26"
+    date_path = "2026/04/03"
 
     try:
         df_bronze = read_adzuna_bronze(spark, date_path)

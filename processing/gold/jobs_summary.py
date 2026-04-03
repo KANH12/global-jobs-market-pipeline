@@ -40,9 +40,9 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
             F.expr("percentile_approx(avg_salary_row, 0.5)").alias("median_salary"),
 
             # contract type counts
-            F.sum(F.when(F.col("contract_type") == "FULL_TIME", 1).otherwise(0)).alias("full_time_count"),
-            F.sum(F.when(F.col("contract_type") == "PART_TIME", 1).otherwise(0)).alias("part_time_count"),
-            F.sum(F.when(F.col("contract_type") == "CONTRACT", 1).otherwise(0)).alias("contract_count"),
+            F.sum(F.when(F.col("contract_time") == "FULL_TIME", 1).otherwise(0)).alias("full_time_count"),
+            F.sum(F.when(F.col("contract_time") == "PART_TIME", 1).otherwise(0)).alias("part_time_count"),
+            F.sum(F.when(F.col("contract_time") == "UNKNOWN", 1).otherwise(0)).alias("contract_count"),
         )
     )
 

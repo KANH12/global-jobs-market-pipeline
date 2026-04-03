@@ -33,28 +33,56 @@ def check_salary(df: DataFrame):
     if invalid > 0:
         logger.warning(f"⚠️ Found {invalid} invalid salary ranges")
 
-#check contract_type
-def check_contract_type(df: DataFrame):
-    valid_values = ["FULL_TIME", "PART_TIME", "CONTRACT", "UNKNOWN"]
+#check contract fields
+def check_contract_fields(df: DataFrame):
+    
+    #========================
+    # Check contract_type
+    #========================
+    valid_contract_type = ["CONTRACT", "UNKNOWN", "PERMANENT"]
 
-    invalid_df = df.filter(~F.col("contract_type").isin(valid_values))
+    invalid_contract_type_df = df.filter(~F.col("contract_type").isin(valid_contract_type))
 
-    invalid_count = invalid_df.count()
+    invalid_contract_type_count = invalid_contract_type_df.count()
 
-    if invalid_count == 0:
+    if invalid_contract_type_count == 0:
         logger.info("✅ No invalid contract_type found")
         return
 
-    logger.warning(f"⚠️ Found {invalid_count} invalid contract_type rows")
+    logger.warning(f"⚠️ Found {invalid_contract_type_count} invalid contract_type rows")
 
-    invalid_summary = (
-        invalid_df
+    invalid_contract_type_summary = (
+        invalid_contract_type_df
         .groupBy("contract_type")
         .count()
         .orderBy(F.desc("count"))
     )
 
-    invalid_summary.show(truncate=False)
+    invalid_contract_type_summary.show(truncate=False)
+
+    #========================
+    # Check contract_time
+    #========================
+    valid_contract_time = ["FULL_TIME", "PART_TIME","UNKNOWN"]
+
+    invalid_contract_time_df = df.filter(~F.col("contract_time").isin(valid_contract_time))
+
+    invalid_contract_time_count = invalid_contract_time_df.count()
+
+    if invalid_contract_time_count == 0:
+        logger.info("✅ No invalid contract_time found")
+        return
+
+    logger.warning(f"⚠️ Found {invalid_contract_time_count} invalid contract_time rows")
+
+    invalid_contract_time_summary = (
+        invalid_contract_time_df
+        .groupBy("contract_time")
+        .count()
+        .orderBy(F.desc("count"))
+    )
+
+    invalid_contract_time_summary.show(truncate=False)
 
 def run_silver_quality_checks(df: DataFrame):
     logger.info("🔍 START Silver quality checks")
@@ -64,6 +92,6 @@ def run_silver_quality_checks(df: DataFrame):
     check_required_fields(df)
     check_duplicates(df)
     check_salary(df)
-    check_contract_type(df)
+    check_contract_fields(df)
 
     logger.info(f"🎉 Silver quality checks done | rows={df.count()} | cols={len(df.columns)}")
