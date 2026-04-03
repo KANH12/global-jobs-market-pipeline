@@ -1,7 +1,7 @@
 from pyspark.sql import functions as F
 from core.spark_session import create_spark_session
 from core.logger import get_job_logger
-from processing.bronze.read_bronze_data import read_adzuna_bronze
+from processing.bronze.read_adzuna_bronze import read_adzuna_bronze
 from quality.silver_quality import run_silver_quality_checks
 
 logger = get_job_logger(
@@ -47,18 +47,18 @@ def deduplicate_jobs(df):
 # 3. Normalize column
 # =========================
 def standardize_contract_type(df):
-    valid_types = ["FULL_TIME", "PART_TIME", "CONTRACT"]
+    df = df.withColumn(
+        "contract_type",
+        F.upper(F.trim(F.col("contract_type")))
+    )
 
     df = df.withColumn(
-    "contract_type",
-    F.when(
-        F.col("contract_type").isNull(),
-        "UNKNOWN"
-    ).when(
-        ~F.col("contract_type").isin(valid_types),
-        "UNKNOWN"
-    ).otherwise(F.col("contract_type"))
-)
+        "contract_type",
+        F.when(F.col("contract_type").isin("FULL_TIME", "FULL-TIME", "PERMANENT"), "FULL_TIME")
+         .when(F.col("contract_type").isin("PART_TIME", "PART-TIME"), "PART_TIME")
+         .when(F.col("contract_type").isin("CONTRACT"), "CONTRACT")
+         .otherwise("UNKNOWN")
+    )
 
     logger.info("🧽 Standardized contract_type")
     return df
@@ -67,7 +67,6 @@ def standardize_contract_type(df):
 def process_silver(df, date_path):
 
     logger.info(f"🚀 START Silver pipeline | date={date_path}")
-    df = df.cache()
 
     # 1. Cleaning
     df = clean_invalid_ids(df)
@@ -75,8 +74,6 @@ def process_silver(df, date_path):
 
     # 2. Standardization
     df = standardize_contract_type(df)
-
-    df.unpersist()
     
     # =========================
     # 3. Select & transform columns

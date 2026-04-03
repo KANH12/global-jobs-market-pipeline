@@ -1,0 +1,11 @@
+2026-04-02 23:50:45,336 | INFO | gold.adzuna_gold_writer | 🚀 START Gold pipeline | date=2026/03/26
+2026-04-02 23:50:51,447 | INFO | gold.adzuna_jobs_gold_summary | 🚀 START building gold jobs_summary
+2026-04-02 23:50:51,840 | INFO | gold.adzuna_jobs_gold_summary | ✅ Gold jobs_summary built successfully
+2026-04-02 23:50:51,841 | INFO | gold.adzuna_gold_salary_analysis | 🚀 Start build gold salary_analysis
+2026-04-02 23:50:51,938 | INFO | gold.adzuna_gold_salary_analysis | ✅ Finished salary_analysis
+2026-04-02 23:50:51,938 | INFO | gold.adzuna_gold_writer | 📂 Writing Gold data to s3a://data-lake/gold/adzuna/jobs_summary/dt=2026/03/26
+2026-04-02 23:50:56,018 | INFO | gold.adzuna_gold_writer | 📊 Output records: 17
+2026-04-02 23:50:56,019 | INFO | gold.adzuna_gold_writer | 🎉 Write completed
+2026-04-02 23:50:56,020 | INFO | gold.adzuna_gold_writer | 📂 Writing Gold data to s3a://data-lake/gold/adzuna/salary_analysis/dt=2026/03/26
+2026-04-02 23:50:58,440 | INFO | gold.adzuna_gold_writer | 📊 Output records: 2
+2026-04-02 23:50:58,441 | INFO | gold.adzuna_gold_writer | 🎉 Write completed

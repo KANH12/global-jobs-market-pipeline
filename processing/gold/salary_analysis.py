@@ -31,26 +31,3 @@ def build_salary_analysis(df_silver: DataFrame) -> DataFrame:
     logger.info("✅ Finished salary_analysis")
 
     return salary_df
-
-# =========================
-# 2. Write gold
-# =========================
-def write_salary_analysis(df: DataFrame, date_path: str):
-
-    output_path = f"s3a://data-lake/gold/adzuna/salary_analysis/dt={date_path}"
-
-    logger.info(f"📂 Writing gold salary analysis → {output_path}")
-
-    # Gold thường nhỏ → 1 file cho đẹp
-    df = df.repartition(1)
-
-    count = df.count()
-
-    (
-        df.write
-        .mode("overwrite")
-        .parquet(output_path)
-    )
-
-    logger.info(f"📊 Output records: {count}")
-    logger.info("🎉 Gold salary_analysis written successfully")

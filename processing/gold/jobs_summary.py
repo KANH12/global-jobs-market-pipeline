@@ -68,27 +68,3 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
     logger.info("✅ Gold jobs_summary built successfully")
 
     return summary_df
-
-
-# =========================
-# 2. Write gold
-# =========================
-def write_jobs_summary(df: DataFrame, date_path: str):
-
-    output_path = f"s3a://data-lake/gold/adzuna/jobs_summary/dt={date_path}"
-
-    logger.info(f"📂 Writing gold jobs_summary → {output_path}")
-
-    # Gold thường nhỏ → 1 file cho đẹp
-    df = df.repartition(1)
-
-    count = df.count()
-
-    (
-        df.write
-        .mode("overwrite")
-        .parquet(output_path)
-    )
-
-    logger.info(f"📊 Output records: {count}")
-    logger.info("🎉 Gold jobs_summary written successfully")
