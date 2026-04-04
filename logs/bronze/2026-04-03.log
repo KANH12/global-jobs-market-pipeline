@@ -19,3 +19,6 @@
 2026-04-03 03:21:48,511 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
 2026-04-03 03:21:48,514 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/04/03
 2026-04-03 03:21:48,516 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/04/03/*.json
+2026-04-03 22:41:58,435 | INFO | bronze.adzuna_bronze_reader | 📂 Reading bronze data
+2026-04-03 22:41:58,436 | INFO | bronze.adzuna_bronze_reader | 📅 date_path=2026/04/03
+2026-04-03 22:41:58,437 | INFO | bronze.adzuna_bronze_reader | 📁 source_path=s3a://data-lake/bronze/adzuna/2026/04/03/*.json

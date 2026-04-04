@@ -42,7 +42,7 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
             # contract type counts
             F.sum(F.when(F.col("contract_time") == "FULL_TIME", 1).otherwise(0)).alias("full_time_count"),
             F.sum(F.when(F.col("contract_time") == "PART_TIME", 1).otherwise(0)).alias("part_time_count"),
-            F.sum(F.when(F.col("contract_time") == "UNKNOWN", 1).otherwise(0)).alias("contract_count"),
+            F.sum(F.when(F.col("contract_time") == "UNKNOWN", 1).otherwise(0)).alias("unknown_count"),
         )
     )
 
@@ -53,7 +53,7 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
         summary_df
         .withColumn("pct_full_time", F.col("full_time_count") / F.col("total_jobs"))
         .withColumn("pct_part_time", F.col("part_time_count") / F.col("total_jobs"))
-        .withColumn("pct_contract", F.col("contract_count") / F.col("total_jobs"))
+        .withColumn("pct_unknown", F.col("unknown_count") / F.col("total_jobs"))
     )
 
     # =========================
@@ -62,7 +62,7 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
     summary_df = summary_df.drop(
         "full_time_count",
         "part_time_count",
-        "contract_count"
+        "unknown_count"
     )
 
     logger.info("✅ Gold jobs_summary built successfully")

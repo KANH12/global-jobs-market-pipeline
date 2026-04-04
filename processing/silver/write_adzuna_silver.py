@@ -69,7 +69,28 @@ def standardize_contract_fields(df):
     )
     logger.info("🧽 Standardized contract fields")
     return df
-    
+
+def normalize_salary(df):
+    logger.info("🧽 Cleaning & normalizing salary")
+
+    df = df.withColumn(
+        "salary_min",
+        F.when(F.col("salary_min") < 1000, 
+               F.col("salary_min") * 1000
+        ).otherwise(F.col("salary_min"))
+    )
+
+    df = df.withColumn(
+        "salary_max",
+        F.when(F.col("salary_max") < 1000, 
+               F.col("salary_max") * 1000
+        ).otherwise(F.col("salary_max"))
+    )
+
+    logger.info("🎉 Normalized salary")
+
+    return df
+
 def process_silver(df, date_path):
 
     logger.info(f"🚀 START Silver pipeline | date={date_path}")
@@ -80,9 +101,12 @@ def process_silver(df, date_path):
 
     # 2. Standardization
     df = standardize_contract_fields(df)
-    
+
+    # 3. Normalize Salalry
+    df = normalize_salary(df)
+
     # =========================
-    # 3. Select & transform columns
+    # 4. Select & transform columns
     # =========================
     jobs_df = df.select(
         F.col("id").alias("job_id"),
@@ -134,7 +158,7 @@ def process_silver(df, date_path):
     return jobs_df
 
     # =========================
-    # 4. Write Parquet
+    # 5. Write Parquet
     # =========================
 
 def write_jobs_silver(jobs_df, date_path: str):
