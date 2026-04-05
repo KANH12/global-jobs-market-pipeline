@@ -5,8 +5,8 @@ services:
     ports:
       - "9001:9001"   
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -34,6 +34,18 @@ services:
       start-notebook.sh
       --NotebookApp.token=''
       --NotebookApp.password=''
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Potyla643125&
+      POSTGRES_DB: jobs_market_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   minio_data:

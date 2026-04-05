@@ -14,7 +14,7 @@ tuning:
 
 s3a:
   endpoint: http://minio:9000
-  access_key: minioadmin
-  secret_key: minioadmin
+  access_key: ${MINIO_ACCESS_KEY}
+  secret_key: ${MINIO_SECRET_KEY}
   path_style_access: true
   impl: org.apache.hadoop.fs.s3a.S3AFileSystem
