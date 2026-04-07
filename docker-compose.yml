@@ -4,10 +4,13 @@ services:
     container_name: minio
     ports:
       - "9001:9001"   
+    env_file:
+      - .env
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     command: server /data --console-address ":9001"
+  
     volumes:
       - minio_data:/data
 
@@ -18,6 +21,8 @@ services:
     container_name: spark
     ports:
       - "8888:8888"
+    env_file:
+      - .env
     volumes:
       - ./ingestion:/home/jovyan/ingestion
       - ./processing:/home/jovyan/processing
@@ -40,12 +45,15 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Potyla643125&
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: jobs_market_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
   minio_data:
+  postgres_data:

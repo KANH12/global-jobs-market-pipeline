@@ -1,0 +1,4 @@
+postgres:
+  host: postgres
+  port: 5432
+  database: jobs_market_db
