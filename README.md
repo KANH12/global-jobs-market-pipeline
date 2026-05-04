@@ -18,7 +18,7 @@ Current progress:
 
 ## Architecture
 
-![Pipeline Architecture](docs/diagram_png.png)
+![Pipeline Architecture](docs/diagram_pic.png)
 
 ---
 
