@@ -18,9 +18,6 @@ logs/
 # Data Lake
 # =========================
 data/
-bronze/
-silver/
-gold/
 *.parquet
 *.csv
 *.json

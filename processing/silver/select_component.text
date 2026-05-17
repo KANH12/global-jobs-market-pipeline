@@ -1,0 +1,33 @@
+job: struct (nullable = true)
+ |    |-- __CLASS__: string (nullable = true)           #REJECTED  
+ |    |-- adref: string (nullable = true)               #REJECTED
+ |    |-- category: struct (nullable = true)
+ |    |    |-- __CLASS__: string (nullable = true)      #REJECTED
+ |    |    |-- label: string (nullable = true)
+ |    |    |-- tag: string (nullable = true)
+ |    |    |-- category_id: string (nullable = false)   #ADDED
+ |    |-- company: struct (nullable = true)
+ |    |    |-- __CLASS__: string (nullable = true)      #REJECTED
+ |    |    |-- display_name: string (nullable = true)
+ |    |    |-- company_id: string (nullable == false)   #ADDED
+ |    |-- contract_time: string (nullable = true)
+ |    |-- contract_type: string (nullable = true)
+ |    |-- created: string (nullable = true)
+ |    |-- description: string (nullable = true)         #REJECTED
+ |    |-- id: string (nullable = true)                  #REMOVE IF ID = NULL
+ |    |-- latitude: double (nullable = true)
+ |    |-- location: struct (nullable = true)
+ |    |    |-- __CLASS__: string (nullable = true)      #REJECTED
+ |    |    |-- area: array (nullable = true)
+ |    |    |    |-- element: string (containsNull = true)
+ |    |    |-- display_name: string (nullable = true)
+ |    |    |-- location_id: string (nullable = false)   #ADDED
+ |    |-- longitude: double (nullable = true)
+ |    |-- redirect_url: string (nullable = true)        #REJECTED
+ |    |-- salary_is_predicted: string (nullable = true)
+ |    |-- salary_max: double (nullable = true)
+ |    |-- salary_min: double (nullable = true)
+ |    |-- title: string (nullable = true)
+
+
+ nullable = random
