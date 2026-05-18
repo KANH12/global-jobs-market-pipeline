@@ -12,7 +12,7 @@ logger = get_job_logger(
 # =========================
 def build_salary_analysis(df_silver: DataFrame) -> DataFrame:
 
-    logger.info("🚀 Start build gold salary_analysis")
+    logger.info("[START] Start build gold salary_analysis")
 
     salary_df = (
         df_silver
@@ -28,6 +28,6 @@ def build_salary_analysis(df_silver: DataFrame) -> DataFrame:
         .orderBy(F.desc("avg_salary_max"))
     )
 
-    logger.info("✅ Finished salary_analysis")
+    logger.info("[SUCCESS] Finished salary_analysis")
 
     return salary_df

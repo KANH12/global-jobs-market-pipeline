@@ -16,7 +16,7 @@ logger = get_job_logger(
 #===================
 
 def write_gold(df: DataFrame, output_path: str):
-    logger.info(f"📂 Writing Gold data to {output_path}")
+    logger.info(f"[START] Writing Gold data to {output_path}")
 
     df = df.repartition(1) # 1 data = 1 file
 
@@ -28,8 +28,8 @@ def write_gold(df: DataFrame, output_path: str):
         .parquet(output_path)
     )
 
-    logger.info(f"📊 Output records: {count}")
-    logger.info("🎉 Write completed")
+    logger.info(f"[INFO] Output records: {count}")
+    logger.info("[SUCCESS] Write completed")
 
 #==================
 # Main
@@ -38,10 +38,10 @@ if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/04/03"
+    date_path = "2026/05/17"
 
     try:
-        logger.info(f"🚀 START Gold pipeline | date={date_path}")
+        logger.info(f"[START] START Gold pipeline | date={date_path}")
 
         #========================
         # 1. Read Silver
@@ -75,9 +75,9 @@ if __name__ == "__main__":
         )
 
     except Exception:
-        logger.error("❌ Gold pipeline failed", exc_info=True)
+        logger.error("[ERROR] Gold pipeline failed", exc_info=True)
         raise
         
     finally:
         spark.stop()
-        logger.info("🛑 Spark stopped")
+        logger.info("[INFO-STOPPED] Spark stopped")

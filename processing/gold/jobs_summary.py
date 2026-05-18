@@ -13,7 +13,7 @@ logger = get_job_logger(
 # =========================
 def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
 
-    logger.info("🚀 START building gold jobs_summary")
+    logger.info("[START] START building gold jobs_summary")
 
     # =========================
     # 1. Prepare salary
@@ -65,6 +65,6 @@ def build_jobs_summary(df_silver: DataFrame) -> DataFrame:
         "unknown_count"
     )
 
-    logger.info("✅ Gold jobs_summary built successfully")
+    logger.info("[SUCCESS] Gold jobs_summary built successfully")
 
     return summary_df

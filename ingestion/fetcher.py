@@ -3,7 +3,9 @@ import yaml
 from pathlib import Path
 import os
 from core.logger import get_job_logger
+from dotenv import load_dotenv
 
+load_dotenv()
 # -------------------------
 # Load API id and keys
 # -------------------------

@@ -19,9 +19,9 @@ logger = get_job_logger(
 def read_adzuna_bronze(spark, date_path: str):
     path = f"s3a://data-lake/bronze/adzuna/{date_path}/*.json"
 
-    logger.info("📂 Reading bronze data")
-    logger.info(f"📅 date_path={date_path}")
-    logger.info(f"📁 source_path={path}")
+    logger.info("Reading bronze data")
+    logger.info(f"date_path={date_path}")
+    logger.info(f"source_path={path}")
 
     df_bronze = (
         spark.read
@@ -34,31 +34,31 @@ def read_adzuna_bronze(spark, date_path: str):
 
 if __name__ == "__main__":
     logger.info("="*60)
-    logger.info("🚀 START adzuna bronze reader")
+    logger.info("[START] Start adzuna bronze reader")
 
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/04/03"
+    date_path = "2026/05/17"
 
     try:
         df_bronze = read_adzuna_bronze(spark, date_path)
 
         record_count = df_bronze.count()
-        logger.info(f"📊 Record count={record_count}")
+        logger.info(f"[INFO] Record count={record_count}")
 
-        logger.info("📐 Schema:")
+        logger.info("[INFO] Schema:")
         df_bronze.printSchema()
 
         run_bronze_quality_checks(df_bronze, logger)
 
-        logger.info("✅ Bronze read completed successfully")
+        logger.info("[SUCCESS] Bronze read completed successfully")
 
     except Exception as e:
-        logger.error("❌ Failed to read bronze data", exc_info=True)
+        logger.error("[ERROR] Failed to read bronze data", exc_info=True)
         raise
 
     finally:
         spark.stop()
-        logger.info("🛑 Spark session stopped")
+        logger.info("[INFO-STOPPED] Spark session stopped")
         logger.info("="*60)

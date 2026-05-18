@@ -11,10 +11,10 @@ def check_record_count(df: DataFrame, logger):
     count = df.count()
 
     if count == 0:
-        logger.error("❌ Bronze dataset is EMPTY")
+        logger.error("[ERROR] Bronze dataset is EMPTY")
         raise Exception("Bronze data ingestion failed")
 
-    logger.info(f"✅ Record count check passed: {count}")
+    logger.info(f"[CHECKED] Record count check passed: {count}")
 
 
 def check_required_columns(df: DataFrame, logger):
@@ -31,10 +31,10 @@ def check_required_columns(df: DataFrame, logger):
     missing = [c for c in required_columns if c not in df_columns]
 
     if missing:
-        logger.error(f"❌ Missing required columns: {missing}")
+        logger.error(f"[ERROR] Missing required columns: {missing}")
         raise Exception("Bronze schema validation failed")
 
-    logger.info("✅ Required columns check passed")
+    logger.info("[CHECKED] Required columns check passed")
 
 
 def check_records_structure(df: DataFrame, logger):
@@ -42,15 +42,15 @@ def check_records_structure(df: DataFrame, logger):
     null_records = df.filter("records IS NULL").count()
 
     if null_records > 0:
-        logger.error(f"❌ Found {null_records} rows with NULL records")
+        logger.error(f"[ERROR] Found {null_records} rows with NULL records")
         raise Exception("Bronze records corrupted")
 
-    logger.info("✅ Records structure check passed")
+    logger.info("[CHECKED] Records structure check passed")
 
 
 def run_bronze_quality_checks(df: DataFrame, logger):
 
-    logger.info("🔍 START Bronze quality checks")
+    logger.info("[START] START Bronze quality checks")
 
     df.cache()
 
@@ -59,5 +59,5 @@ def run_bronze_quality_checks(df: DataFrame, logger):
     check_records_structure(df, logger)
 
     logger.info(
-        f"🎉 Bronze quality checks passed | rows={df.count()} | columns={len(df.columns)}"
+        f"[SUCCESS] Bronze quality checks passed | rows={df.count()} | columns={len(df.columns)}"
     )

@@ -30,6 +30,7 @@ services:
       - ./core:/home/jovyan/core
       - ./logs:/home/jovyan/logs
       - ./quality:/home/jovyan/quality
+      - ./storage:/home/jovyan/storage
     working_dir: /home/jovyan
     environment:
       - PYTHONPATH=/home/jovyan

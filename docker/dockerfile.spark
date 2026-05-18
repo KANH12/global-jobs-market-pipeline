@@ -2,19 +2,19 @@ FROM jupyter/pyspark-notebook:latest
 
 USER root
 
-# -------------------------
 # Python libs
-# -------------------------
 RUN pip install --no-cache-dir \
     minio \
     pandas \
     pyarrow \
     requests \
-    pyyaml
+    pyyaml \
+    python-dotenv
 
-# -------------------------
-# Hadoop S3A 
-# -------------------------
+# Postgres driver
+COPY jars/postgresql-42.7.10.jar /usr/local/spark/jars/
+
+# Hadoop S3A
 ARG HADOOP_VERSION=3.3.2
 ARG AWS_SDK_VERSION=1.12.262
 

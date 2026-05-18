@@ -15,23 +15,23 @@ def check_required_fields(df: DataFrame):
         null_count = df.filter(F.col(col_name).isNull()).count()
 
         if null_count > 0:
-            logger.warning(f"⚠️ {col_name} has {null_count} NULL values")
+            logger.warning(f"[WARNING] {col_name} has {null_count} NULL values")
 
 #check duplicate
 def check_duplicates(df: DataFrame):
     dup = df.groupBy("job_id").count().filter("count > 1").count()
 
     if dup > 0:
-        logger.warning(f"⚠️ Found {dup} duplicate job_ids")
+        logger.warning(f"[WARNING] Found {dup} duplicate job_ids")
     else:
-        logger.info("✅ No duplicates found")
+        logger.info("[CHECKED] No duplicates found")
 
 #check salary
 def check_salary(df: DataFrame):
     invalid = df.filter(F.col("salary_min") > F.col("salary_max")).count()
 
     if invalid > 0:
-        logger.warning(f"⚠️ Found {invalid} invalid salary ranges")
+        logger.warning(f"[WARNING] Found {invalid} invalid salary ranges")
 
 #check contract fields
 def check_contract_fields(df: DataFrame):
@@ -46,10 +46,10 @@ def check_contract_fields(df: DataFrame):
     invalid_contract_type_count = invalid_contract_type_df.count()
 
     if invalid_contract_type_count == 0:
-        logger.info("✅ No invalid contract_type found")
+        logger.info("[CHECKED] No invalid contract_type found")
         return
 
-    logger.warning(f"⚠️ Found {invalid_contract_type_count} invalid contract_type rows")
+    logger.warning(f"[WARNING] Found {invalid_contract_type_count} invalid contract_type rows")
 
     invalid_contract_type_summary = (
         invalid_contract_type_df
@@ -70,10 +70,10 @@ def check_contract_fields(df: DataFrame):
     invalid_contract_time_count = invalid_contract_time_df.count()
 
     if invalid_contract_time_count == 0:
-        logger.info("✅ No invalid contract_time found")
+        logger.info("[CHECKED] No invalid contract_time found")
         return
 
-    logger.warning(f"⚠️ Found {invalid_contract_time_count} invalid contract_time rows")
+    logger.warning(f"[WARNING] Found {invalid_contract_time_count} invalid contract_time rows")
 
     invalid_contract_time_summary = (
         invalid_contract_time_df
@@ -85,7 +85,7 @@ def check_contract_fields(df: DataFrame):
     invalid_contract_time_summary.show(truncate=False)
 
 def run_silver_quality_checks(df: DataFrame):
-    logger.info("🔍 START Silver quality checks")
+    logger.info("[START] START Silver quality checks")
 
     df.cache()
 
@@ -94,4 +94,4 @@ def run_silver_quality_checks(df: DataFrame):
     check_salary(df)
     check_contract_fields(df)
 
-    logger.info(f"🎉 Silver quality checks done | rows={df.count()} | cols={len(df.columns)}")
+    logger.info(f"[SUCCESS] Silver quality checks done | rows={df.count()} | cols={len(df.columns)}")

@@ -9,10 +9,10 @@ logger = get_job_logger(
 def read_adzuna_silver(spark: SparkSession, date_path: str):
     input_path = f"s3a://data-lake/silver/adzuna/jobs/dt={date_path}"
 
-    logger.info(f"📥 Reading silver data from {input_path}")
+    logger.info(f"[START] Reading silver data from {input_path}")
 
     df = spark.read.parquet(input_path)
 
-    logger.info(f"📊 Rows read: {df.count()}")
+    logger.info(f"[INFO] Rows read: {df.count()}")
 
     return df

@@ -30,7 +30,7 @@ def clean_invalid_ids(df):
 
     df = df.filter(F.col("id").isNotNull())
 
-    logger.info(f"🧹 Removed NULL id: {null_id_count}")
+    logger.info(f"[INFO] Removed NULL id: {null_id_count}")
     return df
 
 # =========================
@@ -40,7 +40,7 @@ def deduplicate_jobs(df):
     df_dedup = df.dropDuplicates(["id"])
     duplicate_count = df.count() - df_dedup.count()
 
-    logger.info(f"🧹 Removed duplicate id: {duplicate_count}")
+    logger.info(f"[INFO] Removed duplicate id: {duplicate_count}")
     return df_dedup
 
 # =========================
@@ -67,11 +67,11 @@ def standardize_contract_fields(df):
             F.upper(F.trim(F.col("contract_type")))
         )
     )
-    logger.info("🧽 Standardized contract fields")
+    logger.info("[INFO] Standardized contract fields")
     return df
 
 def normalize_salary(df):
-    logger.info("🧽 Cleaning & normalizing salary")
+    logger.info("[INFO] Cleaning & normalizing salary")
 
     df = df.withColumn(
         "salary_min",
@@ -87,13 +87,13 @@ def normalize_salary(df):
         ).otherwise(F.col("salary_max"))
     )
 
-    logger.info("🎉 Normalized salary")
+    logger.info("[INFO] Normalized salary")
 
     return df
 
 def process_silver(df, date_path):
 
-    logger.info(f"🚀 START Silver pipeline | date={date_path}")
+    logger.info(f"[START] START Silver pipeline | date={date_path}")
 
     # 1. Cleaning
     df = clean_invalid_ids(df)
@@ -153,7 +153,7 @@ def process_silver(df, date_path):
         F.lit(date_path).alias("ingestion_date")
     )
 
-    logger.info("✅ Selected & transformed columns")
+    logger.info("[SUCCESS] Selected & transformed columns")
 
     return jobs_df
 
@@ -167,7 +167,7 @@ def write_jobs_silver(jobs_df, date_path: str):
     #avoid small files problem
     jobs_df = jobs_df.repartition(4)
 
-    logger.info(f"📂 Writing jobs parquet to {output_path}")
+    logger.info(f"[START] Writing jobs parquet to {output_path}")
     count = jobs_df.count()
     (
         jobs_df
@@ -175,15 +175,15 @@ def write_jobs_silver(jobs_df, date_path: str):
         .mode("overwrite")
         .parquet(output_path)
     )
-    logger.info(f"📊 Output records: {count}")
-    logger.info("🎉 Silver jobs parquet written successfully")
+    logger.info(f"[INFO] Output records: {count}")
+    logger.info("[SUCCESS] Silver jobs parquet written successfully")
 
 
 if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/04/03"
+    date_path = "2026/05/17"
     
     try:
         #1. read bronze layer
@@ -202,11 +202,11 @@ if __name__ == "__main__":
         write_jobs_silver(jobs_df, date_path)
         
     except Exception:
-        logger.error("❌ Silver jobs running failed", exc_info=True)
+        logger.error("[ERROR] Silver jobs running failed", exc_info=True)
         raise
         
     finally:
         spark.stop()
-        logger.info("🛑 Spark stopped")
+        logger.info("[INFO-STOPPED] Spark stopped")
 
     

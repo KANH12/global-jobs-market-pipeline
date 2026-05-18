@@ -4,7 +4,9 @@ from io import BytesIO
 from minio import Minio
 from minio.error import S3Error
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # -------------------------
 # MinIO client
 # -------------------------
@@ -51,4 +53,4 @@ def write_batch(batch: dict, bucket: str = "data-lake"):
         content_type="application/json"
     )
 
-    print(f"✅ Written batch to MinIO: {object_name}")
+    print(f"[SUCCESS] Written batch to MinIO: {object_name}")
