@@ -2,14 +2,9 @@ FROM jupyter/pyspark-notebook:latest
 
 USER root
 
-# Python libs
-RUN pip install --no-cache-dir \
-    minio \
-    pandas \
-    pyarrow \
-    requests \
-    pyyaml \
-    python-dotenv
+# Python-Spark libs
+COPY requirements/spark.txt .
+RUN pip install --no-cache-dir -r spark.txt
 
 # Postgres driver
 COPY jars/postgresql-42.7.10.jar /usr/local/spark/jars/

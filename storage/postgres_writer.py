@@ -25,7 +25,7 @@ def load_config(path=None):
 
     config["postgres"]["user"] = os.getenv("POSTGRES_USER")
     config["postgres"]["password"] = os.getenv("POSTGRES_PASSWORD")
-    config["postgres"]["jdbc_url"] = os.getenv("URL_POSTGRES")
+    #config["postgres"]["jdbc_url"] = os.getenv("URL_POSTGRES")
 
     return config
 # =========================

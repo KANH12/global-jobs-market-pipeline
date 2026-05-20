@@ -42,4 +42,4 @@ def run_pipeline(date_path: str):
 
 
 if __name__ == "__main__":
-    run_pipeline("2026/05/17")
+    run_pipeline("2026/05/20")

@@ -55,6 +55,44 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: docker/dockerfile.airflow
+    container_name: airflow-webserver
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - .:/opt/project
+    ports:
+      - "8080:8080"
+    command: webserver
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: docker/dockerfile.airflow
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow-webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - .:/opt/project
+    command: scheduler
+
 volumes:
   minio_data:
   postgres_data:

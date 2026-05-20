@@ -1,0 +1,6 @@
+minio
+pandas
+pyarrow
+requests
+pyyaml
+python-dotenv

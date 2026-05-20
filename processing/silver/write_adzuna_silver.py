@@ -183,7 +183,7 @@ if __name__ == "__main__":
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/05/17"
+    date_path = "2026/05/20"
     
     try:
         #1. read bronze layer
