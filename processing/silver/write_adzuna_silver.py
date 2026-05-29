@@ -1,13 +1,18 @@
+import argparse
+
 from pyspark.sql import functions as F
+
 from core.spark_session import create_spark_session
 from core.logger import get_job_logger
 from processing.bronze.read_adzuna_bronze import read_adzuna_bronze
 from quality.silver_quality import run_silver_quality_checks
 
+
 logger = get_job_logger(
     job_name="adzuna_jobs_silver_writer",
     component="silver"
 )
+
 
 # =========================
 # 0. Explode bronze records → job-level
@@ -19,35 +24,42 @@ def transform_bronze_to_silver(df_bronze):
         .select(F.explode("records").alias("job"))
         .select("job.*")
     )
+
+    logger.info("[SUCCESS] Transformed bronze records to job-level rows")
     return df
 
+
 # =========================
-# 1. Filter invalid jobs 
+# 1. Filter invalid jobs
 # =========================
 def clean_invalid_ids(df):
-
     null_id_count = df.filter(F.col("id").isNull()).count()
 
     df = df.filter(F.col("id").isNotNull())
 
-    logger.info(f"[INFO] Removed NULL id: {null_id_count}")
+    logger.info(f"[INFO] Removed NULL id records: {null_id_count}")
     return df
 
+
 # =========================
-# 2. Checks duplicate 
+# 2. Deduplicate jobs
 # =========================
 def deduplicate_jobs(df):
-    df_dedup = df.dropDuplicates(["id"])
-    duplicate_count = df.count() - df_dedup.count()
+    original_count = df.count()
 
-    logger.info(f"[INFO] Removed duplicate id: {duplicate_count}")
+    df_dedup = df.dropDuplicates(["id"])
+
+    dedup_count = df_dedup.count()
+    duplicate_count = original_count - dedup_count
+
+    logger.info(f"[INFO] Removed duplicate id records: {duplicate_count}")
     return df_dedup
 
+
 # =========================
-# 3. Normalize column
+# 3. Standardize contract fields
 # =========================
 def standardize_contract_fields(df):
-
     df = df.withColumn(
         "contract_time",
         F.when(
@@ -67,33 +79,42 @@ def standardize_contract_fields(df):
             F.upper(F.trim(F.col("contract_type")))
         )
     )
+
     logger.info("[INFO] Standardized contract fields")
     return df
 
+
+# =========================
+# 4. Normalize salary
+# =========================
 def normalize_salary(df):
-    logger.info("[INFO] Cleaning & normalizing salary")
+    logger.info("[START] Cleaning and normalizing salary")
 
     df = df.withColumn(
         "salary_min",
-        F.when(F.col("salary_min") < 1000, 
-               F.col("salary_min") * 1000
+        F.when(
+            F.col("salary_min") < 1000,
+            F.col("salary_min") * 1000
         ).otherwise(F.col("salary_min"))
     )
 
     df = df.withColumn(
         "salary_max",
-        F.when(F.col("salary_max") < 1000, 
-               F.col("salary_max") * 1000
+        F.when(
+            F.col("salary_max") < 1000,
+            F.col("salary_max") * 1000
         ).otherwise(F.col("salary_max"))
     )
 
-    logger.info("[INFO] Normalized salary")
-
+    logger.info("[SUCCESS] Normalized salary")
     return df
 
-def process_silver(df, date_path):
 
-    logger.info(f"[START] START Silver pipeline | date={date_path}")
+# =========================
+# 5. Process silver
+# =========================
+def process_silver(df, date_path: str):
+    logger.info(f"[START] Silver transformation | date={date_path}")
 
     # 1. Cleaning
     df = clean_invalid_ids(df)
@@ -102,12 +123,10 @@ def process_silver(df, date_path):
     # 2. Standardization
     df = standardize_contract_fields(df)
 
-    # 3. Normalize Salalry
+    # 3. Normalize salary
     df = normalize_salary(df)
 
-    # =========================
-    # 4. Select & transform columns
-    # =========================
+    # 4. Select and transform columns
     jobs_df = df.select(
         F.col("id").alias("job_id"),
         F.col("title"),
@@ -150,63 +169,89 @@ def process_silver(df, date_path):
             ),
             256
         ).alias("location_id"),
+
         F.lit(date_path).alias("ingestion_date")
     )
 
-    logger.info("[SUCCESS] Selected & transformed columns")
-
+    logger.info("[SUCCESS] Selected and transformed silver columns")
     return jobs_df
 
-    # =========================
-    # 5. Write Parquet
-    # =========================
 
+# =========================
+# 6. Write silver parquet
+# =========================
 def write_jobs_silver(jobs_df, date_path: str):
     output_path = f"s3a://data-lake/silver/adzuna/jobs/dt={date_path}"
 
-    #avoid small files problem
+    # Avoid small files problem
     jobs_df = jobs_df.repartition(4)
 
-    logger.info(f"[START] Writing jobs parquet to {output_path}")
+    logger.info(f"[START] Writing silver jobs parquet to {output_path}")
+
     count = jobs_df.count()
+
     (
         jobs_df
         .write
         .mode("overwrite")
         .parquet(output_path)
     )
-    logger.info(f"[INFO] Output records: {count}")
+
+    logger.info(f"[INFO] Silver output records: {count}")
     logger.info("[SUCCESS] Silver jobs parquet written successfully")
 
 
+# =========================
+# Silver Pipeline
+# =========================
+def run_silver_pipeline(spark, date_path: str):
+    logger.info("=" * 60)
+    logger.info(f"[START] Silver pipeline | date={date_path}")
+
+    try:
+        # 1. Read bronze layer
+        df_bronze = read_adzuna_bronze(spark, date_path)
+
+        # 2. Transform bronze to silver-level raw job rows
+        df = transform_bronze_to_silver(df_bronze)
+
+        # 3. Process silver layer
+        jobs_df = process_silver(df, date_path)
+
+        # 4. Quality check
+        run_silver_quality_checks(jobs_df)
+
+        # 5. Write silver parquet
+        write_jobs_silver(jobs_df, date_path)
+
+        logger.info("[SUCCESS] Silver pipeline completed successfully")
+
+        return jobs_df
+
+    except Exception:
+        logger.error("[ERROR] Silver pipeline failed", exc_info=True)
+        raise
+
+
+# =========================
+# CLI Entry Point
+# =========================
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--date",
+        required=True,
+        help="Date path format: YYYY/MM/DD, example: 2026/05/20"
+    )
+    args = parser.parse_args()
+
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("ERROR")
 
-    date_path = "2026/05/20"
-    
     try:
-        #1. read bronze layer
-        df_bronze = read_adzuna_bronze(spark, date_path)
+        run_silver_pipeline(spark, args.date)
 
-        #2. transform bronze layer to silver layer
-        df = transform_bronze_to_silver(df_bronze)
-
-        #3. process silver layer
-        jobs_df = process_silver(df, date_path)
-
-        #4. check silver quality
-        run_silver_quality_checks(jobs_df)
-
-        #5. write silver parquet file
-        write_jobs_silver(jobs_df, date_path)
-        
-    except Exception:
-        logger.error("[ERROR] Silver jobs running failed", exc_info=True)
-        raise
-        
     finally:
         spark.stop()
-        logger.info("[INFO-STOPPED] Spark stopped")
-
-    
+        logger.info("[STOP] Spark stopped")
+        logger.info("=" * 60)

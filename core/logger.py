@@ -26,7 +26,7 @@ def get_logger(name: str):
 
 def get_job_logger(job_name: str, component: str):
     
-    VALID_COMPONENTS = {"api", "bronze", "silver", "gold", "database"}
+    VALID_COMPONENTS = {"api", "bronze", "silver", "gold", "database", "processing_pipeline"}
     
     if component not in VALID_COMPONENTS:
         raise ValueError(f"Invalid component: {component}")
