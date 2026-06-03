@@ -8,6 +8,7 @@ from core.logger import get_job_logger
 from processing.silver.read_adzuna_silver import read_adzuna_silver
 from processing.gold.jobs_summary import build_jobs_summary
 from processing.gold.salary_analysis import build_salary_analysis
+from processing.gold.jobs_detail import build_jobs_detail
 
 
 logger = get_job_logger(
@@ -54,16 +55,25 @@ def run_gold_pipeline(spark, date_path: str):
         # 3. Build salary analysis
         df_salary_analysis = build_salary_analysis(df_silver)
 
-        # 4. Write jobs summary
+        # 4. Build jobs detail
+        df_jobs_detail = build_jobs_detail(df_silver)
+
+        # 5. Write jobs summary
         write_gold(
             df_jobs_summary,
             f"s3a://data-lake/gold/adzuna/jobs_summary/dt={date_path}"
         )
 
-        # 5. Write salary analysis
+        # 6. Write salary analysis
         write_gold(
             df_salary_analysis,
             f"s3a://data-lake/gold/adzuna/salary_analysis/dt={date_path}"
+        )
+
+        # 7. Write jobs detail
+        write_gold(
+            df_jobs_detail,
+            f"s3a://data-lake/gold/adzuna/jobs_detail/dt={date_path}"
         )
 
         logger.info("[SUCCESS] Gold pipeline completed successfully")

@@ -95,6 +95,24 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: scheduler
 
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/dockerfile.streamlit
+    container_name: streamlit
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: jobs_market_db
+    volumes:
+      - ./app:/app
+    depends_on:
+      - postgres
+    
 volumes:
   minio_data:
   postgres_data:

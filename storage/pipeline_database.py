@@ -1,7 +1,11 @@
 import argparse
 
 from core.spark_session import create_spark_session
-from storage.read_minio import read_jobs_summary, read_salary_analysis
+from storage.read_minio import (
+    read_jobs_summary,
+    read_salary_analysis,
+    read_jobs_detail
+)
 from storage.postgres_writer import write_to_postgres
 from core.logger import get_job_logger
 
@@ -24,18 +28,22 @@ def run_pipeline(date_path: str):
         # =========================
         df_jobs = read_jobs_summary(spark, date_path)
         df_salary = read_salary_analysis(spark, date_path)
+        df_jobs_detail = read_jobs_detail(spark, date_path)
 
         jobs_count = df_jobs.count()
         salary_count = df_salary.count()
+        jobs_detail_count = df_jobs_detail.count()
 
         logger.info(f"[INFO] jobs_summary count: {jobs_count}")
         logger.info(f"[INFO] salary_analysis count: {salary_count}")
+        logger.info(f"[INFO] jobs_detail count: {jobs_detail_count}")
 
         # =========================
         # 2. Write Gold data to PostgreSQL
         # =========================
         write_to_postgres(df_jobs, "jobs_summary")
         write_to_postgres(df_salary, "salary_analysis")
+        write_to_postgres(df_jobs_detail, "jobs_detail")
 
         logger.info("[SUCCESS] Database pipeline completed")
 
