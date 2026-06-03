@@ -1,18 +1,14 @@
 # Global Jobs Market Data Pipeline
 
-## Project Status
+An end-to-end data engineering project that collects job market data from the Adzuna API, processes it through a Bronze/Silver/Gold data lake architecture, loads serving-ready datasets into PostgreSQL, orchestrates the workflow with Apache Airflow, and visualizes insights through a Streamlit dashboard.
 
-Current progress:
+---
 
-- ✅ API Ingestion  
-- ✅ Bronze Layer (raw data ingestion)  
-- ✅ Bronze Data Quality Checks  
-- ✅ Silver Layer transformation  
-- ✅ Silver Data Quality Checks  
-- ✅ Gold Layer (jobs_summary, salary_analysis)  
+## Overview
 
-- 🚧 Orchestration with Airflow  
-- 🚧 Data visualization  
+This project simulates a modern batch data pipeline for job market analytics and job-level exploration.
+
+The pipeline extracts job postings from the Adzuna API, stores raw data in MinIO, transforms data using Apache Spark, loads curated datasets into PostgreSQL, and serves an interactive Streamlit dashboard.
 
 ---
 
@@ -20,255 +16,228 @@ Current progress:
 
 ![Pipeline Architecture](docs/diagram_pic.png)
 
+```text
+Adzuna API
+   ↓
+Python Ingestion
+   ↓
+MinIO Data Lake
+   ├── Bronze: Raw JSON
+   ├── Silver: Cleaned job-level data
+   └── Gold: Serving-ready datasets
+   ↓
+PostgreSQL
+   ├── jobs_detail
+   ├── jobs_summary
+   └── salary_analysis
+   ↓
+Streamlit Dashboard
+
+Airflow orchestrates:
+ingestion → processing → database loading
+```
+
 ---
 
 ## Tech Stack
 
-- Python  
-- Apache Spark  
-- Docker  
-- MinIO (S3-compatible object storage)  
-- Structured Logging  
-- Data Quality Validation  
+| Layer            | Tools                  |
+| ---------------- | ---------------------- |
+| Data Source      | Adzuna Jobs API        |
+| Ingestion        | Python, Requests       |
+| Processing       | Apache Spark, PySpark  |
+| Data Lake        | MinIO, S3A             |
+| Storage Format   | JSON, Parquet          |
+| Serving Database | PostgreSQL             |
+| Orchestration    | Apache Airflow         |
+| Dashboard        | Streamlit, Plotly      |
+| Infrastructure   | Docker, Docker Compose |
 
 ---
 
-## Project Structure
+## Key Features
 
-```
-global-jobs-market-pipeline/
-
-core/
-spark_session.py
-logger.py
-
-ingestion/
-fetcher.py
-batch_builder.py
-writer.py
-run_ingestion.py
-
-processing/
-bronze/
-read_bronze_data.py
-
-silver/
-write_jobs_silver_parquet.py
-
-gold/
-jobs_summary.py
-salary_analysis.py
-
-quality/
-bronze_quality.py
-silver_quality.py
-
-logs/
-api/
-bronze/
-silver/
-gold/
-
-docs/
-architecture diagrams
-
-docker/
-container setup
-```
+* API-based batch data ingestion
+* Bronze/Silver/Gold Medallion Architecture
+* Spark-based data transformation
+* Data quality checks for Bronze and Silver layers
+* MinIO object storage with S3A integration
+* PostgreSQL serving layer
+* Airflow orchestration
+* Streamlit dashboard with analytics and job exploration
+* Fully containerized local data platform
 
 ---
 
-## Data Architecture
-
-The project uses a **Medallion Architecture** to organize the data pipeline.
+## Data Pipeline
 
 ### Bronze Layer
 
-The Bronze layer stores **raw ingested data** with minimal processing.
+Stores raw API responses in JSON format.
 
-**Characteristics:**
-
-- Raw API responses  
-- Stored as JSON  
-- Partitioned by ingestion date  
-- Includes metadata such as batch_id and ingestion timestamp  
-
-**Example storage path:**
-
-```
+```text
 s3a://data-lake/bronze/adzuna/YYYY/MM/DD/
 ```
 
-
-Bronze data is not transformed but validated to ensure ingestion integrity.
-
----
-
-### Bronze Data Quality Checks
-
-Before transforming the data further, a **data quality validation step** runs on the Bronze dataset.
-
-**Current checks include:**
-
-- Record count validation  
-- Required column validation  
-- Records structure validation  
-
-**Example validations:**
-
-- Dataset must not be empty  
-- Required fields must exist  
-- Raw records must not be NULL  
-
-These checks help detect **ingestion failures and schema issues early in the pipeline**.
-
----
-
 ### Silver Layer
 
-The Silver layer contains **cleaned and structured datasets** derived from Bronze data.
+Stores cleaned and normalized job-level data in Parquet format.
 
-**Transformations performed:**
-
-- Flatten nested job records  
-- Remove invalid records (NULL ids)  
-- Deduplicate job records  
-- Standardize categorical fields (e.g. contract_type)  
-- Normalize job attributes  
-- Extract important fields such as title, salary, company, and location  
-- Store structured datasets in Parquet format  
-
-**Example output:**
-
-```
+```text
 s3a://data-lake/silver/adzuna/jobs/dt=YYYY/MM/DD/
 ```
 
-
-Silver data is optimized for **analytics and downstream processing**.
-
----
-
-### Silver Data Quality Checks
-
-After transformation, the Silver dataset is validated to ensure data consistency and correctness.
-
-**Current checks include:**
-
-- Duplicate job_id detection  
-- Invalid categorical values (e.g. contract_type)  
-- Record count monitoring  
-
-These checks help identify **data issues introduced during transformation**.
-
----
-
 ### Gold Layer
 
-The Gold layer contains **aggregated datasets designed for analytics and reporting**.
+Stores serving-ready datasets for analytics and dashboard usage.
 
-Unlike Silver (row-level data), Gold datasets are grouped and summarized to provide business insights.
+| Dataset           | Purpose                               |
+| ----------------- | ------------------------------------- |
+| `jobs_detail`     | Job-level data for Job Explorer       |
+| `jobs_summary`    | Aggregated job statistics by category |
+| `salary_analysis` | Salary statistics by contract type    |
 
-#### jobs_summary
-
-Provides an overview of the job market across categories.
-
-**Aggregations include:**
-
-- Total number of jobs per category  
-- Average, minimum, and maximum salary  
-- Median salary estimation  
-
-**Example output:**
-
-```
+```text
+s3a://data-lake/gold/adzuna/jobs_detail/dt=YYYY/MM/DD/
 s3a://data-lake/gold/adzuna/jobs_summary/dt=YYYY/MM/DD/
-```
-
-
-#### salary_analysis
-
-Analyzes salary distribution across job types.
-
-**Aggregations include:**
-
-- Job count by contract_type  
-- Average salary (min and max)  
-- Median salary  
-- Maximum salary  
-
-**Example output:**
-
-```
 s3a://data-lake/gold/adzuna/salary_analysis/dt=YYYY/MM/DD/
 ```
 
 ---
 
-## Logging
+## Dashboard
 
-The pipeline uses **structured logging** to track job execution.
+![Streamlit Dashboard](docs/streamlit_dashboard.png)
 
-**Logs are organized by pipeline component:**
+The Streamlit dashboard includes:
 
-
-```
-logs/
-  api/
-  bronze/
-  silver/
-  gold/
-```
-
-Each pipeline run writes logs containing:
-
-- job start and completion  
-- dataset statistics  
-- data quality results  
-- Spark execution events  
-
-This helps with **debugging pipeline failures and monitoring data processing**.
+* Market Overview
+* Job Explorer
+* Salary Analysis
+* Data Explorer
+* Search and filters
+* Job cards and data tables
+* CSV download
 
 ---
 
-## Example Pipeline Flow
+## Project Structure
 
-1. API ingestion collects job data  
-2. Raw data stored in Bronze layer  
-3. Bronze quality checks validate ingestion  
-4. Spark transforms data into Silver layer  
-5. Silver quality checks validate cleaned data  
-6. Aggregated datasets generated in Gold layer  
+```text
+global-jobs-market-pipeline/
+├── airflow/
+├── app/
+├── config/
+├── core/
+├── docker/
+├── ingestion/
+├── processing/
+│   ├── bronze/
+│   ├── silver/
+│   └── gold/
+├── quality/
+├── storage/
+├── requirements/
+├── docs/
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root.
+
+```env
+# MinIO
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+
+# Adzuna API
+ADZUNA_APP_ID=your_app_id
+ADZUNA_APP_KEY=your_app_key
+
+# PostgreSQL
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=jobs_market_db
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+```
+
+Do not commit the real `.env` file.
+
+---
+
+## How to Run
+
+Build and start all services:
+
+```bash
+docker compose up -d --build
+```
+
+Expected services:
+
+```text
+minio
+spark
+postgres
+airflow-webserver
+airflow-scheduler
+streamlit
+```
+
+Service URLs:
+
+| Service       | URL                   |
+| ------------- | --------------------- |
+| Airflow       | http://localhost:8080 |
+| Streamlit     | http://localhost:8501 |
+| MinIO Console | http://localhost:9001 |
+| PostgreSQL    | http://localhost:5432 |
+
+It only runs when Docker is enabled!
+---
+
+## Airflow Setup
+
+Initialize Airflow metadata database:
+
+```bash
+docker exec -it airflow-webserver airflow db migrate
+```
+
+Create an admin user:
+
+```bash
+docker exec -it airflow-webserver airflow users create --username admin --password admin --firstname Khang --lastname Le --role Admin --email admin@example.com
+```
+
+Trigger the DAG manually:
+
+```bash
+docker exec -it airflow-webserver airflow dags test adzuna_jobs_market_pipeline 2026-06-02
+```
 
 ---
 
 ## Future Improvements
 
-Planned features for the pipeline:
-
-- Workflow orchestration with Apache Airflow  
-- Schema drift detection  
-- Automated data quality reporting  
-- Dashboard visualization for job market insights  
-- Additional Gold datasets (location, company insights, trends)  
-
----
-
-## Learning Goals
-
-This project demonstrates key data engineering concepts:
-
-- Building batch data pipelines  
-- Implementing Medallion architecture  
-- Using Apache Spark for data transformation  
-- Designing data quality validation layers  
-- Building analytical data models (Gold layer)  
-- Implementing structured logging for pipelines  
+* Crawl Vietnamese IT job websites
+* Extract technical skills from job descriptions
+* Add historical trend analysis
+* Add Discord or email notifications
+* Deploy to cloud or VPS
+* Add dashboard authentication
+* Improve incremental loading strategy
+* Add database indexes for faster job search
 
 ---
 
 ## Author
 
-**Khang**  
-Data Engineering Portfolio Project 🚀
-
+**Khang Le**
+Data Engineering Portfolio Project
