@@ -76,6 +76,27 @@ Adzuna API → Raw JSON (Bronze) → Cleaned Data (Silver) → Aggregated Data (
 
 ---
 
+## Data Quality
+
+Data quality checks are applied at different stages of the pipeline:
+
+- **Bronze (strict validation)**  
+  - Record count check (prevent empty data)  
+  - Schema validation (required columns)  
+  - Null check on critical fields  
+  → Fail-fast if invalid  
+
+- **Silver (monitoring)**  
+  - Null checks on key fields (job_id, title, company_name)  
+  - Duplicate detection (job_id)  
+  - Salary validation (salary_min ≤ salary_max)  
+  - Domain validation (contract_type, contract_time)  
+  → Logs warnings without stopping pipeline  
+
+All checks are implemented using PySpark transformations.
+
+---
+
 ## Data Pipeline
 
 ### Bronze Layer
