@@ -93,7 +93,21 @@ Data quality checks are applied at different stages of the pipeline:
   - Domain validation (contract_type, contract_time)  
   → Logs warnings without stopping pipeline  
 
-All checks are implemented using PySpark transformations.
+### Example Execution Log (Silver Layer Validation)
+
+Here is a snippet from the Spark executor log demonstrating how the pipeline successfully catches data anomalies (such as an invalid salary range) and logs a warning without crashing the entire batch:
+
+<details>
+<summary><b>Click to expand Spark Silver Pipeline Log</b></summary>
+
+```text
+2026-06-03 08:33:51,480 | INFO | silver.adzuna_silver_quality | [START] START Silver quality checks
+2026-06-03 08:33:55,411 | INFO | silver.adzuna_silver_quality | [CHECKED] No duplicates found
+2026-06-03 08:33:55,937 | WARNING | silver.adzuna_silver_quality | [WARNING] Found 1 invalid salary ranges
+2026-06-03 08:33:56,459 | INFO | silver.adzuna_silver_quality | [CHECKED] No invalid contract_type found
+2026-06-03 08:33:56,801 | INFO | silver.adzuna_silver_quality | [SUCCESS] Silver quality checks done | rows=246 | cols=18
+```
+</details>
 
 ---
 
@@ -106,6 +120,7 @@ Stores raw API responses in JSON format.
 ```text
 s3a://data-lake/bronze/adzuna/YYYY/MM/DD/
 ```
+
 
 ### Silver Layer
 
