@@ -1,97 +1,150 @@
-# Global Jobs Market Data Pipeline
+# 🌍 Global Jobs Market Data Platform
 
-An end-to-end data engineering project that collects job market data from the Adzuna API, processes it through a Bronze/Silver/Gold data lake architecture, loads serving-ready datasets into PostgreSQL, orchestrates the workflow with Apache Airflow, and visualizes insights through a Streamlit dashboard.
+An end-to-end **modular data pipeline system** designed to collect, process, validate, and serve global job market data.
+
+This project simulates a **real-world data engineering workflow**, combining batch processing, data quality validation, orchestration, and analytics delivery.
 
 ---
 
 ## Overview
 
-This project aims to collect and analyze global job market data to provide insights into job demand, salary distribution, and hiring trends.
+This project builds a complete data platform to analyze global job market trends, including:
 
-The pipeline extracts job postings from the Adzuna API, stores raw data in MinIO, transforms data using Apache Spark, loads curated datasets into PostgreSQL, and serves an interactive Streamlit dashboard.
+- Job demand distribution  
+- Salary insights  
+- Hiring patterns  
+
+The system follows a **Medallion Architecture (Bronze → Silver → Gold)** and integrates multiple components:
+
+- API ingestion  
+- Distributed data processing (PySpark)  
+- Data quality validation  
+- Data warehouse serving layer  
+- Dashboard visualization  
+
+---
+
+## Why This Project
+
+In real-world data systems, raw data is often inconsistent and unreliable.  
+This project focuses on building a robust pipeline that ensures data quality, scalability, and maintainability.
+
+It demonstrates how to design a production-like data platform that can be extended to real-time processing and cloud environments.
 
 ---
 
 ## Architecture
 
 ![Pipeline Architecture](docs/diagram_pic.png)
-*Note: Notification system (e.g., Discord alerts) is planned for future implementation.*
+
 
 ```text
 Adzuna API
-   ↓
-Python Ingestion
-   ↓
-MinIO Data Lake
-   ├── Bronze: Raw JSON
-   ├── Silver: Cleaned job-level data
-   └── Gold: Serving-ready datasets
-   ↓
-PostgreSQL
-   ├── jobs_detail
-   ├── jobs_summary
-   └── salary_analysis
-   ↓
+    ↓
+Ingestion Layer (Python)
+    ↓
+Data Lake (MinIO - S3)
+├── Bronze: Raw JSON
+├── Silver: Cleaned & validated data
+└── Gold: Business-ready datasets
+    ↓
+Serving Layer (PostgreSQL)
+    ↓
 Streamlit Dashboard
 
-Airflow orchestrates:
-ingestion → processing → database loading
+Orchestration: Apache Airflow
 ```
+
+---
+
+## System Design Highlights
+
+- **Modular pipeline architecture**  
+  Separate ingestion, processing, and quality layers  
+
+- **Configuration-driven system**  
+  YAML-based configuration for flexible pipeline management  
+
+- **Structured logging system**  
+  Tracks pipeline execution and debugging  
+
+- **Data quality validation with severity levels**  
+  Warning vs fail-fast logic  
+
+- **Partitioned data storage**  
+  Optimized for scalability and query performance  
+
+- **Containerized environment**  
+  Fully reproducible using Docker
 
 ---
 
 ## Tech Stack
 
 | Layer            | Tools                  |
-| ---------------- | ---------------------- |
-| Data Source      | Adzuna Jobs API        |
-| Ingestion        | Python, Requests       |
-| Processing       | Apache Spark, PySpark  |
-| Data Lake        | MinIO, S3A             |
-| Storage Format   | JSON, Parquet          |
-| Serving Database | PostgreSQL             |
-| Orchestration    | Apache Airflow         |
-| Dashboard        | Streamlit, Plotly      |
-| Infrastructure   | Docker, Docker Compose |
+|------------------|------------------------|
+| Data Source      | Adzuna API            |
+| Ingestion        | Python, Requests      |
+| Processing       | PySpark               |
+| Data Lake        | MinIO (S3A)           |
+| Storage Format   | JSON, Parquet         |
+| Serving DB       | PostgreSQL            |
+| Orchestration    | Airflow               |
+| Visualization    | Streamlit, Plotly     |
+| Infrastructure   | Docker                |
 
 ---
 
 ## Key Features
 
-* API-based batch data ingestion
-* Bronze/Silver/Gold Medallion Architecture
-* Spark-based data transformation
-* Data quality checks for Bronze and Silver layers
-* MinIO object storage with S3A integration
-* PostgreSQL serving layer
-* Airflow orchestration
-* Streamlit dashboard with analytics and job exploration
-* Fully containerized local data platform
+- End-to-end batch data pipeline  
+- Medallion Architecture (Bronze / Silver / Gold)  
+- PySpark-based data transformation  
+- Data quality validation at multiple layers  
+- Structured logging for monitoring  
+- Airflow-based orchestration  
+- Partitioned data storage (by date)  
+- PostgreSQL serving layer  
+- Interactive Streamlit dashboard  
+- Fully containerized system
 
 ---
 ## Data Flow Summary
 
-Adzuna API → Raw JSON (Bronze) → Cleaned Data (Silver) → Aggregated Data (Gold)
-→ PostgreSQL → Streamlit Dashboard
+Adzuna API
+-> Bronze (Raw JSON)
+-> Silver (Cleaned & validated data)
+-> Gold (Aggregated datasets)
+-> PostgreSQL
+-> Dashboard
 
 ---
 
 ## Data Quality
 
-Data quality checks are applied at different stages of the pipeline:
+### 🔹 Bronze Layer (Strict Validation)
 
-- **Bronze (strict validation)**  
-  - Record count check (prevent empty data)  
-  - Schema validation (required columns)  
-  - Null check on critical fields  
-  → Fail-fast if invalid  
+- Schema validation  
+- Required fields check  
+- Empty data prevention  
 
-- **Silver (monitoring)**  
-  - Null checks on key fields (job_id, title, company_name)  
-  - Duplicate detection (job_id)  
-  - Salary validation (salary_min ≤ salary_max)  
-  - Domain validation (contract_type, contract_time)  
-  → Logs warnings without stopping pipeline  
+👉 **Fail-fast mechanism applied**
+
+---
+
+### 🔹 Silver Layer (Monitoring & Validation)
+
+- Duplicate detection (`job_id`)  
+- Null checks on critical fields  
+- Salary validation (`salary_min ≤ salary_max`)  
+- Domain validation  
+
+👉 **Severity-based logic:**
+
+- Warning → log and continue  
+- Critical → stop pipeline  
+
+---
 
 ### Example Execution Log (Silver Layer Validation)
 
@@ -111,7 +164,7 @@ Here is a snippet from the Spark executor log demonstrating how the pipeline suc
 
 ---
 
-## Data Pipeline
+## Data Storage Design
 
 ### Bronze Layer
 
@@ -120,7 +173,6 @@ Stores raw API responses in JSON format.
 ```text
 s3a://data-lake/bronze/adzuna/YYYY/MM/DD/
 ```
-
 
 ### Silver Layer
 
@@ -134,11 +186,11 @@ s3a://data-lake/silver/adzuna/jobs/dt=YYYY/MM/DD/
 
 Stores serving-ready datasets for analytics and dashboard usage.
 
-| Dataset           | Purpose                               |
-| ----------------- | ------------------------------------- |
-| `jobs_detail`     | Job-level data for Job Explorer       |
-| `jobs_summary`    | Aggregated job statistics by category |
-| `salary_analysis` | Salary statistics by contract type    |
+| Dataset           | Description |
+|------------------|-------------|
+| jobs_detail      | Job-level dataset |
+| jobs_summary     | Aggregated statistics |
+| salary_analysis  | Salary insights |
 
 ```text
 s3a://data-lake/gold/adzuna/jobs_detail/dt=YYYY/MM/DD/
@@ -169,23 +221,25 @@ The Streamlit dashboard includes:
 
 ```text
 global-jobs-market-pipeline/
-├── airflow/
-├── app/
-├── config/
-├── core/
-├── docker/
-├── ingestion/
-├── processing/
+├── airflow/                  # Workflow orchestration
+├── app/                      # Streamlit dashboard
+├── config/                   # YAML configurations
+├── core/                     # Shared utilities (logger, config loader)
+├── docker/                   # Container setup
+├── ingestion/                # API data ingestion
+├── processing/               # PySpark transformations
 │   ├── bronze/
 │   ├── silver/
 │   └── gold/
 │
-├── quality/
-├── storage/
-├── requirements/
-├── docs/
-├── docker-compose.yml
-├── .env.example
+├── quality/                  # Data validation logic
+├── storage/                  # Database interaction
+├── requirements/             # Service-based dependencies (Airflow, Spark, Streamlit)
+├── docs/                     # Diagrams, images
+├── scripts/                  # Pipeline runners / manual jobs
+├── docker-compose.yml        # Multi-service container orchestration
+├── .env.example              # Environment variables template
+├── .gitignore 
 └── README.md
 ```
 
@@ -246,21 +300,7 @@ Ensure Docker is installed and running before starting the services.
 
 ---
 
-## Airflow Setup
-
-Initialize Airflow metadata database:
-
-```bash
-docker exec -it airflow-webserver airflow db migrate
-```
-
-Create an admin user:
-
-```bash
-docker exec -it airflow-webserver airflow users create --username admin --password admin --firstname Khang --lastname Le --role Admin --email admin@example.com
-```
-
-Trigger the DAG manually:
+## Airflow DAG
 
 ```bash
 docker exec -it airflow-webserver airflow dags test adzuna_jobs_market_pipeline 2026-06-02
@@ -270,11 +310,11 @@ docker exec -it airflow-webserver airflow dags test adzuna_jobs_market_pipeline 
 
 ## Future Improvements
 
-- Implement near real-time ingestion using Kafka
-- Enhance incremental loading strategy with change tracking
-- Add data observability and monitoring (e.g., data freshness, pipeline failures)
-- Implement alerting system (Discord or email)
-- Optimize query performance with indexing and partitioning
+- Near real-time pipeline (Kafka)
+- Incremental data processing
+- Data observability metrics
+- Alerting system (Slack/Discord)
+- Cloud deployment (AWS/GCP)
 
 ---
 

@@ -2,7 +2,7 @@
 
 from fetcher import fetch_all_jobs
 from batch_builder import build_batches
-from writer import write_batch
+from storage.writer_minio import write_batch
 
 
 def main():
