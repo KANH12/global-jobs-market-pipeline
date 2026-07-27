@@ -36,7 +36,7 @@ with DAG(
         task_id="run_processing_pipeline",
         bash_command=(
             "docker exec spark "
-            "spark-submit /home/jovyan/processing/run_processing_pipeline.py "
+            "spark-submit /home/jovyan/scripts/run_processing_pipeline.py "
             f"--date {DATE_PATH}"
         ),
     )
