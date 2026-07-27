@@ -31,6 +31,9 @@ services:
       - ./logs:/home/jovyan/logs
       - ./quality:/home/jovyan/quality
       - ./storage:/home/jovyan/storage
+      - ./scripts:/home/jovyan/scripts
+      - ./tests:/home/jovyan/tests
+      - ./jars:/home/jovyan/jars
     working_dir: /home/jovyan
     environment:
       - PYTHONPATH=/home/jovyan
