@@ -1,9 +1,11 @@
-import yaml
 import os
-from dotenv import load_dotenv
-from core.logger import get_job_logger
-from pyspark.sql import DataFrame
 from pathlib import Path
+
+import yaml
+from dotenv import load_dotenv
+from pyspark.sql import DataFrame
+
+from core.logger import get_job_logger
 
 logger = get_job_logger(
     job_name="adzuna_jobs_postgres_writer",

@@ -1,14 +1,9 @@
 import argparse
 
-from core.spark_session import create_spark_session
-from storage.read_minio import (
-    read_jobs_summary,
-    read_salary_analysis,
-    read_jobs_detail
-)
-from storage.postgres_writer import write_to_postgres
 from core.logger import get_job_logger
-
+from core.spark_session import create_spark_session
+from storage.postgres_writer import write_to_postgres
+from storage.read_minio import read_jobs_detail, read_jobs_summary, read_salary_analysis
 
 logger = get_job_logger(
     job_name="adzuna_pipeline_database",

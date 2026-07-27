@@ -3,6 +3,7 @@
 # =========================
 .env
 *.env
+venv/
 config/secrets.yaml
 config/*.key
 
