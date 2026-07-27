@@ -6,6 +6,10 @@ USER root
 COPY requirements/spark.txt .
 RUN pip install --no-cache-dir -r spark.txt
 
+# Requirement tests
+COPY requirements/tests.txt /tmp/tests.txt
+RUN pip install --no-cache-dir -r /tmp/tests.txt
+
 # Postgres driver
 COPY jars/postgresql-42.7.10.jar /usr/local/spark/jars/
 
