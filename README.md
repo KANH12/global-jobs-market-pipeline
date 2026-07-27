@@ -233,7 +233,7 @@ global-jobs-market-pipeline/
 │   └── gold/
 │
 ├── quality/                  # Data validation logic
-├── storage/                  # Database interaction
+├── storage/                  # Data lake and database interaction (MinIO, PostgreSQL)
 ├── requirements/             # Service-based dependencies (Airflow, Spark, Streamlit)
 ├── docs/                     # Diagrams, images
 ├── scripts/                  # Pipeline runners / manual jobs
