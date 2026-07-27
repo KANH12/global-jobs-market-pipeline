@@ -1,0 +1,8 @@
+pytest
+pytest-cov   
+pytest-mock 
+pyspark==3.5.0
+python-dotenv
+pyyaml
+boto3
+psycopg2-binary
