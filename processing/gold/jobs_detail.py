@@ -28,8 +28,8 @@ def build_jobs_detail(df_silver: DataFrame) -> DataFrame:
             F.col("salary_min").isNotNull() & F.col("salary_max").isNotNull()
         )
         .withColumn(
-            "created_date",
-            F.to_date(F.col("created"))
+            "posted_date",
+            F.to_date(F.col("posted_at"))
         )
         .withColumn(
             "job_search_text",
@@ -53,8 +53,8 @@ def build_jobs_detail(df_silver: DataFrame) -> DataFrame:
             "location_name",
             "contract_time",
             "contract_type",
-            "created",
-            "created_date",
+            "posted_at",
+            "posted_date",
             "salary_min",
             "salary_max",
             "salary_avg",
@@ -67,6 +67,8 @@ def build_jobs_detail(df_silver: DataFrame) -> DataFrame:
             "category_id",
             "company_id",
             "location_id",
+            "job_url",
+            "source",
             "job_search_text",
             "ingestion_date"
         )

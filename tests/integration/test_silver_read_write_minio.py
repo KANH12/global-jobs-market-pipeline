@@ -7,8 +7,8 @@ from pyspark.sql.types import (
     StructType,
 )
 
-from processing.silver.read_adzuna_silver import read_adzuna_silver
-from processing.silver.write_adzuna_silver import (
+from processing.silver.read_silver import read_adzuna_silver
+from processing.silver.build_silver import (
     process_silver,
     transform_bronze_to_silver,
     write_jobs_silver,

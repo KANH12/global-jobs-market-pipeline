@@ -1,4 +1,4 @@
-from processing.bronze.read_adzuna_bronze import read_adzuna_bronze
+from processing.bronze.read_bronze import read_adzuna_bronze
 
 TEST_DATE = "9999/01/01"
 BRONZE_PATH = f"s3a://data-lake/bronze/adzuna/{TEST_DATE}"

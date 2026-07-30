@@ -7,7 +7,7 @@ from pyspark.sql.types import (
     StructType,
 )
 
-from processing.silver.write_adzuna_silver import (
+from processing.silver.build_silver import (
     clean_invalid_ids,
     deduplicate_jobs,
     normalize_salary,

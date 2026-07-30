@@ -1,6 +1,6 @@
 from pyspark.sql.types import LongType, StringType, StructField, StructType
 
-from processing.gold.write_adzuna_gold import write_gold
+from processing.gold.build_gold import write_gold
 
 TEST_DATE = "9999/01/01"
 GOLD_PATH = f"s3a://data-lake/gold/adzuna/jobs_summary/dt={TEST_DATE}"
