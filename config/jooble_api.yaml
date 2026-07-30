@@ -1,0 +1,8 @@
+base_url: https://jooble.org/api
+
+keywords: "IT, Data, Engineer, Developer, Analyst"
+location: "us"
+
+max_pages: 30
+
+timeout: 30
