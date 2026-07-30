@@ -1,8 +1,41 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
+from db import load_jobs_detail, load_jobs_summary, load_salary_analysis
 
-from db import load_jobs_summary, load_salary_analysis, load_jobs_detail
+# =========================
+# Shared design tokens
+# =========================
+CONTRACT_TIME_COLORS = {
+    "FULL_TIME": "#4F46E5",
+    "PART_TIME": "#06B6D4",
+    "UNKNOWN": "#CBD5E1",
+}
+
+SALARY_SERIES_COLORS = {
+    "avg_salary_min": "#4F46E5",
+    "avg_salary_max": "#A5B4FC",
+    "avg_salary": "#4F46E5",
+    "median_salary": "#A5B4FC",
+}
+
+PRIMARY_COLOR = "#4F46E5"
+
+_CHART_FONT = dict(family="Inter, -apple-system, sans-serif", size=13, color="#374151")
+
+
+def style_chart(fig, height: int = 500):
+    fig.update_layout(
+        height=height,
+        font=_CHART_FONT,
+        title_font_size=16,
+        title_font_color="#111827",
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        legend_title_font_color="#374151",
+        margin=dict(t=60, l=10, r=10, b=10),
+    )
+    return fig
 
 
 # =========================
@@ -21,10 +54,18 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         .main-title {
             font-size: 42px;
             font-weight: 800;
             margin-bottom: 0px;
+            color: #111827;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
@@ -34,10 +75,13 @@ st.markdown(
         }
 
         .section-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             margin-top: 25px;
             margin-bottom: 15px;
+            color: #111827;
+            padding-left: 12px;
+            border-left: 4px solid #4F46E5;
         }
 
         .metric-card {
@@ -45,12 +89,16 @@ st.markdown(
             padding: 20px;
             border-radius: 16px;
             border: 1px solid #e5e7eb;
+            border-top: 3px solid #4F46E5;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .metric-label {
             color: #6b7280;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
             margin-bottom: 8px;
         }
 
@@ -62,7 +110,7 @@ st.markdown(
 
         .status-badge {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 999px;
             background-color: #dcfce7;
             color: #166534;
@@ -72,11 +120,17 @@ st.markdown(
 
         .job-card {
             background-color: #ffffff;
-            padding: 18px;
+            padding: 18px 18px 18px 20px;
             border-radius: 14px;
             border: 1px solid #e5e7eb;
+            border-left: 4px solid #4F46E5;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             margin-bottom: 14px;
+            transition: box-shadow 0.15s ease;
+        }
+
+        .job-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
 
         .job-title {
@@ -102,6 +156,23 @@ st.markdown(
             font-weight: 600;
             margin-right: 6px;
             margin-top: 8px;
+        }
+
+        /* Badge riêng cho từng nguồn dữ liệu - dễ phân biệt trên job card */
+        .pill-source-adzuna {
+            background-color: #EEF2FF;
+            color: #4F46E5;
+        }
+
+        .pill-source-jooble {
+            background-color: #FEF3C7;
+            color: #B45309;
+        }
+
+        /* Đồng bộ style tab với accent color chính */
+        .stTabs [aria-selected="true"] {
+            color: #4F46E5 !important;
+            border-bottom-color: #4F46E5 !important;
         }
     </style>
     """,
@@ -138,7 +209,7 @@ st.markdown(
 )
 
 st.markdown(
-    '<div class="subtitle">Adzuna jobs data pipeline: API → MinIO → Spark → PostgreSQL → Streamlit</div>',
+    '<div class="subtitle">Multi-source jobs data pipeline (Adzuna, Jooble): API → MinIO → Spark → PostgreSQL → Streamlit</div>',
     unsafe_allow_html=True
 )
 
@@ -229,6 +300,22 @@ if "contract_time" in filtered_salary.columns:
             filtered_detail = filtered_detail[
                 filtered_detail["contract_time"].isin(selected_contracts)
             ]
+
+
+# Source filter
+if "source" in filtered_detail.columns:
+    available_sources = sorted(filtered_detail["source"].dropna().unique())
+
+    selected_sources = st.sidebar.multiselect(
+        "Source",
+        options=available_sources,
+        default=available_sources
+    )
+
+    if selected_sources:
+        filtered_detail = filtered_detail[
+            filtered_detail["source"].isin(selected_sources)
+        ]
 
 
 # =========================
@@ -349,13 +436,14 @@ with tab_overview:
                 labels={
                     "total_jobs": "Total Jobs",
                     "category_label": "Category"
-                }
+                },
+                color_discrete_sequence=[PRIMARY_COLOR]
             )
 
             fig.update_layout(
-                yaxis={"categoryorder": "total ascending"},
-                height=500
+                yaxis={"categoryorder": "total ascending"}
             )
+            style_chart(fig)
 
             st.plotly_chart(fig, use_container_width=True)
         else:
@@ -388,15 +476,22 @@ with tab_overview:
                 ]
             })
 
+            # Bỏ các nhóm giá trị = 0 (vd: PART_TIME 0%) - tránh lát cắt rỗng gây rối mắt
+            contract_distribution = contract_distribution[
+                contract_distribution["estimated_jobs"] > 0
+            ]
+
             fig = px.pie(
                 contract_distribution,
                 names="contract_type",
                 values="estimated_jobs",
                 title="Estimated Jobs by Contract Type",
-                hole=0.45
+                hole=0.45,
+                color="contract_type",
+                color_discrete_map=CONTRACT_TIME_COLORS
             )
 
-            fig.update_layout(height=500)
+            style_chart(fig)
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("Missing contract percentage columns.")
@@ -522,7 +617,7 @@ with tab_explorer:
 
         sort_options = []
 
-        if "created_date" in explorer_df.columns:
+        if "posted_date" in explorer_df.columns:
             sort_options.append("Newest")
 
         if "salary_avg" in explorer_df.columns:
@@ -536,8 +631,8 @@ with tab_explorer:
             index=0
         )
 
-        if selected_sort == "Newest" and "created_date" in explorer_df.columns:
-            explorer_df = explorer_df.sort_values("created_date", ascending=False)
+        if selected_sort == "Newest" and "posted_date" in explorer_df.columns:
+            explorer_df = explorer_df.sort_values("posted_date", ascending=False)
 
         elif selected_sort == "Highest Salary" and "salary_avg" in explorer_df.columns:
             explorer_df = explorer_df.sort_values("salary_avg", ascending=False)
@@ -567,8 +662,9 @@ with tab_explorer:
                 category = row.get("category_label", "Unknown category")
                 contract_time = row.get("contract_time", "UNKNOWN")
                 contract_type = row.get("contract_type", "UNKNOWN")
-                created_date = row.get("created_date", row.get("created", "Unknown"))
+                posted_date = row.get("posted_date", "Unknown")
                 salary_range = row.get("salary_range", "Not available")
+                source = row.get("source", None)
 
                 st.markdown(
                     f"""
@@ -578,9 +674,10 @@ with tab_explorer:
                         <div class="job-meta"><b>Location:</b> {location}</div>
                         <div class="job-meta"><b>Category:</b> {category}</div>
                         <div class="job-meta"><b>Salary:</b> {salary_range}</div>
-                        <div class="job-meta"><b>Created:</b> {created_date}</div>
+                        <div class="job-meta"><b>Posted:</b> {posted_date}</div>
                         <span class="pill">{contract_time}</span>
                         <span class="pill">{contract_type}</span>
+                        {f'<span class="pill pill-source-{source}">{source}</span>' if source else ''}
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -595,12 +692,13 @@ with tab_explorer:
                 "location_name",
                 "contract_time",
                 "contract_type",
-                "created_date",
+                "posted_date",
                 "salary_min",
                 "salary_max",
                 "salary_avg",
                 "salary_range",
                 "salary_is_predicted",
+                "source",
                 "ingestion_date"
             ]
 
@@ -656,10 +754,11 @@ with tab_salary:
                         "contract_time": "Contract Time",
                         "salary": "Salary",
                         "salary_type": "Salary Type"
-                    }
+                    },
+                    color_discrete_map=SALARY_SERIES_COLORS
                 )
 
-                fig.update_layout(height=500)
+                style_chart(fig)
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info(
@@ -677,14 +776,17 @@ with tab_salary:
                     filtered_salary.sort_values("median_salary", ascending=False),
                     x="contract_time",
                     y="median_salary",
+                    color="contract_time",
                     title="Median Salary by Contract Time",
                     labels={
                         "contract_time": "Contract Time",
                         "median_salary": "Median Salary"
-                    }
+                    },
+                    color_discrete_map=CONTRACT_TIME_COLORS
                 )
 
-                fig.update_layout(height=500)
+                fig.update_layout(showlegend=False)
+                style_chart(fig)
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Missing contract_time or median_salary columns.")
@@ -695,15 +797,19 @@ with tab_salary:
         )
 
         if {"contract_time", "job_count"}.issubset(filtered_salary.columns):
+            pie_data = filtered_salary[filtered_salary["job_count"] > 0]
+
             fig = px.pie(
-                filtered_salary,
+                pie_data,
                 names="contract_time",
                 values="job_count",
                 title="Job Count by Contract Time",
-                hole=0.45
+                hole=0.45,
+                color="contract_time",
+                color_discrete_map=CONTRACT_TIME_COLORS
             )
 
-            fig.update_layout(height=500)
+            style_chart(fig)
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("Missing contract_time or job_count columns.")
@@ -777,10 +883,11 @@ with tab_salary:
                 "category_label": "Category",
                 "salary": "Salary",
                 "salary_type": "Salary Type"
-            }
+            },
+            color_discrete_map=SALARY_SERIES_COLORS
         )
 
-        fig.update_layout(height=500)
+        style_chart(fig)
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Missing category salary columns from jobs_summary.")
