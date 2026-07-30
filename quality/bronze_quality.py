@@ -1,10 +1,5 @@
 from pyspark.sql import DataFrame
-from core.logger import get_job_logger
 
-logger = get_job_logger(
-    job_name="adzuna_bronze_quality",
-    component="bronze"
-)
 
 def check_record_count(df: DataFrame, logger):
 
