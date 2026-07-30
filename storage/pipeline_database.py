@@ -6,7 +6,7 @@ from storage.postgres_writer import write_to_postgres
 from storage.read_minio import read_jobs_detail, read_jobs_summary, read_salary_analysis
 
 logger = get_job_logger(
-    job_name="adzuna_pipeline_database",
+    job_name="pipeline_database",
     component="database"
 )
 
@@ -18,9 +18,7 @@ def run_pipeline(date_path: str):
     spark.sparkContext.setLogLevel("ERROR")
 
     try:
-        # =========================
-        # 1. Read Gold data from MinIO
-        # =========================
+        # Read Gold data from MinIO
         df_jobs = read_jobs_summary(spark, date_path)
         df_salary = read_salary_analysis(spark, date_path)
         df_jobs_detail = read_jobs_detail(spark, date_path)
@@ -33,9 +31,6 @@ def run_pipeline(date_path: str):
         logger.info(f"[INFO] salary_analysis count: {salary_count}")
         logger.info(f"[INFO] jobs_detail count: {jobs_detail_count}")
 
-        # =========================
-        # 2. Write Gold data to PostgreSQL
-        # =========================
         write_to_postgres(df_jobs, "jobs_summary")
         write_to_postgres(df_salary, "salary_analysis")
         write_to_postgres(df_jobs_detail, "jobs_detail")

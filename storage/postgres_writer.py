@@ -8,15 +8,13 @@ from pyspark.sql import DataFrame
 from core.logger import get_job_logger
 
 logger = get_job_logger(
-    job_name="adzuna_jobs_postgres_writer",
+    job_name="jobs_postgres_writer",
     component="database"
 )
 
 load_dotenv()
 
-# =========================
-# Load config
-# =========================
+
 def load_config(path=None):
     if path is None:
         BASE_DIR = Path(__file__).resolve().parents[1]
@@ -30,9 +28,8 @@ def load_config(path=None):
     #config["postgres"]["jdbc_url"] = os.getenv("URL_POSTGRES")
 
     return config
-# =========================
-# Write to PostgreSQL
-# =========================
+
+
 def write_to_postgres(
     df: DataFrame,
     table_name: str,
