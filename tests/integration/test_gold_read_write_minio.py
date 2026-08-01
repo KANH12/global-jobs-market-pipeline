@@ -3,7 +3,8 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType
 from processing.gold.build_gold import write_gold
 
 TEST_DATE = "9999/01/01"
-GOLD_PATH = f"s3a://data-lake/gold/adzuna/jobs_summary/dt={TEST_DATE}"
+
+GOLD_PATH = f"s3a://data-lake/gold/jobs_summary/dt={TEST_DATE}"
 
 SILVER_SCHEMA = StructType([
     StructField("ingestion_date", StringType(), True),
@@ -29,7 +30,6 @@ def test_write_gold_round_trip(spark, cleanup_s3a_paths):
     write_gold(df_gold, GOLD_PATH)
     cleanup_s3a_paths.append(GOLD_PATH)
 
-    # Đọc lại thật từ MinIO - verify file Parquet ghi ra đọc lại đúng, không lỗi format
     result = spark.read.parquet(GOLD_PATH)
 
     assert result.count() == 1

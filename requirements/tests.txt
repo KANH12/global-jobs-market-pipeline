@@ -1,7 +1,7 @@
 pytest
 pytest-cov   
 pytest-mock 
-pyspark==3.5.0
+pyspark==4.2.0
 python-dotenv
 pyyaml
 boto3

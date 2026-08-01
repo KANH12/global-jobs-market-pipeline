@@ -6,13 +6,39 @@ Integration tests cover the **real I/O boundary** — reading/writing MinIO (S3A
 
 Must run **inside the Spark container** (not on the Windows host), since it needs the internal Docker network to resolve `minio:9000`, `postgres:5432`.
 
+## Design Philosophy
+
+The testing strategy follows a layered approach:
+
+- Unit tests validate transformation logic in isolation using Spark local mode
+- Integration tests validate infrastructure connectivity (MinIO, PostgreSQL) and the real read/write boundary between pipeline layers
+
+This separation ensures:
+
+- Fast feedback during development (unit tests)
+- High confidence in production behavior (integration tests)
+
+## Coverage Scope
+
+Integration tests cover:
+
+- Bronze layer — reading real JSON from MinIO, per source (`adzuna`, `jooble`)
+- Silver layer — full transform + write + read round-trip, **unified across all sources**
+- Gold layer — write Parquet + read back round-trip
+- Postgres — write via JDBC + read back to verify
+
+They explicitly exclude:
+
+- Transform/business logic correctness (already covered by unit tests — see `unit-tests.md`)
+- Any source that isn't wired into `NORMALIZERS` in `build_silver.py`
+
 ## Structure
 
 ```
 tests/integration/
 ├── conftest.py                        # Spark session with S3A + MinIO/Postgres cleanup fixtures
-├── test_bronze_read_write_minio.py    # read real bronze JSON from MinIO
-├── test_silver_read_write_minio.py    # write Silver Parquet + read back (round-trip)
+├── test_bronze_read_write_minio.py    # read real bronze JSON from MinIO, parametrized by source
+├── test_silver_read_write_minio.py    # full pipeline: seed bronze per source -> process_silver -> write -> read back unified
 ├── test_gold_read_write_minio.py      # write Gold Parquet + read back (round-trip)
 └── test_database_writer_postgres.py   # write to Postgres via JDBC + read back to verify
 ```
@@ -23,6 +49,19 @@ tests/integration/
 docker compose exec spark pytest tests/integration -v
 ```
 
+Current run: **8 passed in ~354s (5m54s)**.
+
+## Multi-source architecture — what changed when `jooble` was added
+
+The pipeline was refactored from a single-source (`adzuna`-only) design to a multi-source one. This has a direct impact on how each layer is tested:
+
+- **Bronze stays per-source.** Each source is still written to its own path (`s3a://data-lake/bronze/{source}/{date}/*.json`) and read via the generic `read_bronze(spark, source, date_path)`. The bronze test is simply **parametrized** over `["adzuna", "jooble"]` — the same test body covers both sources, since the read logic itself doesn't care which source it is.
+- **Silver and Gold are unified, not per-source.** `process_silver(spark, sources: list, date_path)` reads bronze for every source in the list, normalizes each one through its own normalizer (`adzuna_normalizer.normalize`, `jooble_normalizer.normalize`), unions them into one common schema, then dedups/standardizes/enriches across the whole set. The output path dropped its `/adzuna/` segment entirely: `s3a://data-lake/silver/jobs/dt=...` and `s3a://data-lake/gold/jobs_summary/dt=...`. `read_silver`/gold reads no longer take a `source` argument.
+- **Each normalizer has its own raw bronze schema.** Adzuna's raw job is nested (`category.label`, `company.display_name`, `location.display_name`) while Jooble's is flat (`company`, `location` as plain strings) and needs extra parsing (`salary` as a free-text string parsed into `salary_min`/`salary_max`, `type` mapped into `contract_time`/`contract_type`). The silver integration test seeds both shapes separately before unioning.
+- **Cross-source dedup relies on the `{source}_{id}` prefix.** Since `job_id` is built as `f"{source}_{raw_id}"` in each normalizer, two different sources can never collide on `job_id` even if their raw ids overlap. A dedicated test still checks that duplicate `job_id`s *within* the same source (e.g. the same job re-ingested in two batches) collapse to one row.
+
+**Takeaway for the next new source:** adding a source means adding a parametrize case to the bronze test, a new raw-schema + seed helper to the silver test, and one more entry in `NORMALIZERS` — the unified silver/gold path and test structure don't need to change at all.
+
 ## Test data strategy: automatic seed + cleanup
 
 Each test seeds its own fake data into MinIO/Postgres **before** it runs, and **cleans it up** afterward — it doesn't depend on real data already present from a previous pipeline run.
@@ -30,7 +69,7 @@ Each test seeds its own fake data into MinIO/Postgres **before** it runs, and **
 Why this approach over relying on existing real data:
 - The suite is reproducible on another machine (fresh clone, `docker compose up` from scratch, empty MinIO — tests still pass since they create the data they need).
 - It doesn't break when real data gets deleted/overwritten by another Airflow run.
-- It scales well when new data sources are added later (just add a dedicated seed fixture for that source).
+- It scales well when new data sources are added later — confirmed in practice when `jooble` was added: the bronze test only needed a `@pytest.mark.parametrize("source", [...])`, and the silver test only needed a second seed helper (`_jooble_job`) with its own raw schema.
 
 All test data uses a fixed dummy date `9999/01/01` (never overlapping with the pipeline's real production dates), to prevent the cleanup fixture from ever accidentally deleting real data if a bug slips in.
 
@@ -86,9 +125,17 @@ Once every environment layer was solid, the last failure was a **test logic** is
 
 **Fix:** declared an explicit `StructType` for the bronze job schema (same approach used in the unit tests), passed via `spark.createDataFrame(data, schema=...)`.
 
-## Takeaways
+## Testing Strategy
+
+- Bronze layer → read-only round-trip, parametrized per source (`adzuna`, `jooble`)
+- Silver layer → full pipeline round-trip: seed multi-source bronze → `process_silver` → write → read back unified, plus a dedicated dedup test
+- Gold layer → write/read Parquet round-trip on the unified path
+- Postgres → write/read JDBC round-trip, source-agnostic
+
+## Key Takeaways
 
 - **PySpark on Windows needs 3 foundational things** before logic even comes into play: `winutils.exe`/`hadoop.dll` (native Hadoop binaries), `PYSPARK_PYTHON` pointing to the right `python.exe` (Windows has no `python3`), and extra JARs that don't conflict in version with the ones already shipped in the Spark image.
 - **`docker compose restart` ≠ `docker compose up -d`** — any change in `docker-compose.yml` (volumes, ports, env) needs `up -d` for the container to be recreated with the new config.
 - **Not pinning a dependency version (`pyspark` without `==`) is a real risk**, not just a theoretical one — it caused a major version mismatch between PySpark (Python side) and the Spark runtime (JVM) already running in the container, producing an error that gave no hint it was a version mismatch.
 - **Explicit schemas when building test DataFrames** don't just prevent simple type errors (`CANNOT_INFER_TYPE`) — they also prevent deeper execution-time failures (struct star-expansion) when nested fields are involved.
+- **Unifying Silver/Gold across sources simplified the test surface**, not complicated it: adding `jooble` only meant parametrizing bronze and adding one seed helper for silver — the write/read paths and Gold layer needed no source-specific test at all.
