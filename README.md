@@ -227,7 +227,7 @@ s3a://data-lake/gold/salary_analysis/dt=YYYY/MM/DD/
 
 ## Dashboard
 
-![Streamlit Dashboard](docs/job_explorer.png)
+![Streamlit Dashboard](docs/streamlit_dashboard.png)
 
 The dashboard enables users to explore job market trends, analyze salary distribution, and search job listings interactively across all integrated sources.
 
