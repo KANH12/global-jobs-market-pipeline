@@ -1,4 +1,4 @@
-# 🌍 Global Jobs Market Data Platform
+# Global Jobs Market Data Platform
 
 An end-to-end **modular data pipeline system** designed to collect, process, validate, and serve global job market data from multiple sources.
 
@@ -142,7 +142,7 @@ Adzuna API, Jooble API
 
 ## Data Quality
 
-### 🔹 Bronze Layer (Strict Validation)
+### Bronze Layer (Strict Validation)
 
 - Schema validation
 - Required fields check
@@ -152,7 +152,7 @@ Adzuna API, Jooble API
 
 ---
 
-### 🔹 Silver Layer (Monitoring & Validation)
+### Silver Layer (Monitoring & Validation)
 
 - Duplicate detection (`job_id`, after source-prefixing)
 - Null checks on critical fields
